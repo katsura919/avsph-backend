@@ -1,0 +1,33 @@
+import fp from 'fastify-plugin';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
+const swaggerPlugin = async (fastify) => {
+    await fastify.register(swagger, {
+        openapi: {
+            openapi: '3.0.0',
+            info: {
+                title: 'AVSPH API',
+                description: 'Advanced Virtual Staff PH - Staffing Agency API',
+                version: '1.0.0',
+            },
+            tags: [
+                { name: 'Health', description: 'Health check endpoints' },
+                { name: 'Users', description: 'Staff member management' },
+            ],
+        },
+    });
+    await fastify.register(swaggerUi, {
+        routePrefix: '/docs',
+        uiConfig: {
+            docExpansion: 'list',
+            deepLinking: true,
+        },
+        staticCSP: true,
+    });
+    fastify.log.info('📖 Swagger docs available at /docs');
+};
+export default fp(swaggerPlugin, {
+    name: 'swagger',
+    dependencies: ['env'],
+});
+//# sourceMappingURL=swagger.js.map

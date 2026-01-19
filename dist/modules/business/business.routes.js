@@ -1,0 +1,146 @@
+import { businessJsonSchema, createBusinessJsonSchema, updateBusinessJsonSchema, } from '../../types/business.types.js';
+import { getAllBusinesses, getBusinessById, getBusinessBySlug, createBusiness, updateBusiness, deleteBusiness, } from './business.controllers.js';
+const businessRoutes = async (fastify) => {
+    // GET /businesses - Get all businesses (public)
+    fastify.get('/businesses', {
+        schema: {
+            description: 'Get all active businesses',
+            tags: ['Businesses'],
+            response: {
+                200: {
+                    type: 'array',
+                    items: businessJsonSchema,
+                },
+            },
+        },
+    }, getAllBusinesses);
+    // GET /businesses/:id - Get business by ID
+    fastify.get('/businesses/:id', {
+        schema: {
+            description: 'Get a business by ID',
+            tags: ['Businesses'],
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                },
+                required: ['id'],
+            },
+            response: {
+                200: businessJsonSchema,
+                404: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+            },
+        },
+    }, getBusinessById);
+    // GET /businesses/slug/:slug - Get business by slug (public)
+    fastify.get('/businesses/slug/:slug', {
+        schema: {
+            description: 'Get a business by slug',
+            tags: ['Businesses'],
+            params: {
+                type: 'object',
+                properties: {
+                    slug: { type: 'string', description: 'Business slug' },
+                },
+                required: ['slug'],
+            },
+            response: {
+                200: businessJsonSchema,
+                404: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+            },
+        },
+    }, getBusinessBySlug);
+    // POST /businesses - Create business (protected)
+    fastify.post('/businesses', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Create a new business',
+            tags: ['Businesses'],
+            security: [{ bearerAuth: [] }],
+            body: createBusinessJsonSchema,
+            response: {
+                201: businessJsonSchema,
+                400: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' },
+                        details: { type: 'array' },
+                    },
+                },
+                409: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+            },
+        },
+    }, createBusiness);
+    // PUT /businesses/:id - Update business (protected)
+    fastify.put('/businesses/:id', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Update a business',
+            tags: ['Businesses'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                },
+                required: ['id'],
+            },
+            body: updateBusinessJsonSchema,
+            response: {
+                200: businessJsonSchema,
+                400: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' },
+                        details: { type: 'array' },
+                    },
+                },
+                404: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+                409: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+            },
+        },
+    }, updateBusiness);
+    // DELETE /businesses/:id - Soft delete business (protected)
+    fastify.delete('/businesses/:id', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Soft delete a business',
+            tags: ['Businesses'],
+            security: [{ bearerAuth: [] }],
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                },
+                required: ['id'],
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: { message: { type: 'string' } },
+                },
+                404: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
+                },
+            },
+        },
+    }, deleteBusiness);
+};
+export default businessRoutes;
+//# sourceMappingURL=business.routes.js.map

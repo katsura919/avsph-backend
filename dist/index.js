@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import { envPlugin, corsPlugin, securityPlugin, sensiblePlugin, mongodbPlugin, swaggerPlugin } from './plugins/index.js';
+import { envPlugin, corsPlugin, securityPlugin, sensiblePlugin, mongodbPlugin, swaggerPlugin, authPlugin } from './plugins/index.js';
 import routes from './routes/routes.js';
 async function buildApp() {
     const fastify = Fastify({
@@ -21,6 +21,7 @@ async function buildApp() {
     await fastify.register(envPlugin);
     await fastify.register(sensiblePlugin);
     await fastify.register(mongodbPlugin);
+    await fastify.register(authPlugin);
     await fastify.register(swaggerPlugin);
     await fastify.register(corsPlugin);
     await fastify.register(securityPlugin);

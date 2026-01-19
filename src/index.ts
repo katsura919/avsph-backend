@@ -66,9 +66,6 @@ async function start() {
 
         await fastify.listen({ port, host });
 
-        fastify.log.info(`🚀 Server running at http://${host}:${port}`);
-        fastify.log.info(`📚 API available at http://${host}:${port}/api`);
-        fastify.log.info(`❤️ Health check at http://${host}:${port}/health`);
     } catch (err) {
         console.error('Failed to start server:', err);
         process.exit(1);

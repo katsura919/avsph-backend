@@ -102,9 +102,6 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
 }>;
-export type Blog = z.infer<typeof blogSchema>;
-export type CreateBlog = z.infer<typeof createBlogSchema>;
-export type UpdateBlog = z.infer<typeof updateBlogSchema>;
 export declare const blogJsonSchema: {
     readonly type: "object";
     readonly properties: {

@@ -77,9 +77,6 @@ export declare const updateBusinessSchema: z.ZodObject<{
     logo?: string | undefined;
     website?: string | undefined;
 }>;
-export type Business = z.infer<typeof businessSchema>;
-export type CreateBusiness = z.infer<typeof createBusinessSchema>;
-export type UpdateBusiness = z.infer<typeof updateBusinessSchema>;
 export declare const businessJsonSchema: {
     readonly type: "object";
     readonly properties: {

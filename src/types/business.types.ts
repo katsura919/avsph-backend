@@ -21,11 +21,6 @@ export const createBusinessSchema = businessSchema.omit({
 
 export const updateBusinessSchema = createBusinessSchema.partial();
 
-// Types
-export type Business = z.infer<typeof businessSchema>;
-export type CreateBusiness = z.infer<typeof createBusinessSchema>;
-export type UpdateBusiness = z.infer<typeof updateBusinessSchema>;
-
 // JSON Schemas
 export const businessJsonSchema = {
     type: 'object',

@@ -30,11 +30,6 @@ export const createBlogSchema = blogSchema.omit({
 
 export const updateBlogSchema = createBlogSchema.partial().omit({ businessId: true });
 
-// Types
-export type Blog = z.infer<typeof blogSchema>;
-export type CreateBlog = z.infer<typeof createBlogSchema>;
-export type UpdateBlog = z.infer<typeof updateBlogSchema>;
-
 // JSON Schemas
 export const blogJsonSchema = {
     type: 'object',

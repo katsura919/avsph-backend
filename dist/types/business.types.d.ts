@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export declare const businessSchema: z.ZodObject<{
     _id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -6,11 +6,14 @@ export declare const businessSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodString>;
     logo: z.ZodOptional<z.ZodString>;
     website: z.ZodOptional<z.ZodString>;
+    adminIds: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    createdBy: z.ZodOptional<z.ZodString>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
+    adminIds: string[];
     isActive: boolean;
     slug: string;
     description?: string | undefined;
@@ -19,16 +22,19 @@ export declare const businessSchema: z.ZodObject<{
     updatedAt?: string | undefined;
     logo?: string | undefined;
     website?: string | undefined;
+    createdBy?: string | undefined;
 }, {
     name: string;
     slug: string;
     description?: string | undefined;
     _id?: string | undefined;
+    adminIds?: string[] | undefined;
     isActive?: boolean | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
     logo?: string | undefined;
     website?: string | undefined;
+    createdBy?: string | undefined;
 }>;
 export declare const createBusinessSchema: z.ZodObject<Omit<{
     _id: z.ZodOptional<z.ZodString>;
@@ -37,10 +43,12 @@ export declare const createBusinessSchema: z.ZodObject<Omit<{
     description: z.ZodOptional<z.ZodString>;
     logo: z.ZodOptional<z.ZodString>;
     website: z.ZodOptional<z.ZodString>;
+    adminIds: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    createdBy: z.ZodOptional<z.ZodString>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
-}, "_id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {
+}, "_id" | "adminIds" | "createdAt" | "updatedAt" | "createdBy">, "strip", z.ZodTypeAny, {
     name: string;
     isActive: boolean;
     slug: string;
@@ -104,6 +112,15 @@ export declare const businessJsonSchema: {
         readonly website: {
             readonly type: "string";
             readonly format: "uri";
+        };
+        readonly adminIds: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+            };
+        };
+        readonly createdBy: {
+            readonly type: "string";
         };
         readonly isActive: {
             readonly type: "boolean";

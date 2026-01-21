@@ -1,11 +1,15 @@
-import { z } from 'zod';
+import { z } from "zod";
+// Admin roles
+export const adminRoleEnum = z.enum(["super-admin", "admin"]);
 // Admin schema for validation
 export const adminSchema = z.object({
     _id: z.string().optional(),
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    firstName: z.string().min(1, 'First name is required').max(50),
-    lastName: z.string().min(1, 'Last name is required').max(50),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    firstName: z.string().min(1, "First name is required").max(50),
+    lastName: z.string().min(1, "Last name is required").max(50),
+    role: adminRoleEnum.default("admin"),
+    businessIds: z.array(z.string()).default([]),
     isActive: z.boolean().default(true),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
@@ -16,49 +20,73 @@ export const createAdminSchema = adminSchema.omit({
     createdAt: true,
     updatedAt: true,
 });
+// Schema for updating admin (by super-admin)
+export const updateAdminSchema = z.object({
+    firstName: z.string().min(1).max(50).optional(),
+    lastName: z.string().min(1).max(50).optional(),
+    email: z.string().email().optional(),
+    role: adminRoleEnum.optional(),
+    businessIds: z.array(z.string()).optional(),
+    isActive: z.boolean().optional(),
+});
 // Schema for login
 export const loginSchema = z.object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(1, 'Password is required'),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(1, "Password is required"),
 });
 // JSON Schemas for Fastify
 export const adminJsonSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-        _id: { type: 'string' },
-        email: { type: 'string', format: 'email' },
-        firstName: { type: 'string', minLength: 1, maxLength: 50 },
-        lastName: { type: 'string', minLength: 1, maxLength: 50 },
-        isActive: { type: 'boolean' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' },
+        _id: { type: "string" },
+        email: { type: "string", format: "email" },
+        firstName: { type: "string", minLength: 1, maxLength: 50 },
+        lastName: { type: "string", minLength: 1, maxLength: 50 },
+        role: { type: "string", enum: ["super-admin", "admin"] },
+        businessIds: { type: "array", items: { type: "string" } },
+        isActive: { type: "boolean" },
+        createdAt: { type: "string", format: "date-time" },
+        updatedAt: { type: "string", format: "date-time" },
     },
-    required: ['email', 'firstName', 'lastName'],
+    required: ["email", "firstName", "lastName", "role"],
 };
 export const createAdminJsonSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-        email: { type: 'string', format: 'email' },
-        password: { type: 'string', minLength: 8 },
-        firstName: { type: 'string', minLength: 1, maxLength: 50 },
-        lastName: { type: 'string', minLength: 1, maxLength: 50 },
+        email: { type: "string", format: "email" },
+        password: { type: "string", minLength: 8 },
+        firstName: { type: "string", minLength: 1, maxLength: 50 },
+        lastName: { type: "string", minLength: 1, maxLength: 50 },
+        role: { type: "string", enum: ["super-admin", "admin"], default: "admin" },
+        businessIds: { type: "array", items: { type: "string" }, default: [] },
     },
-    required: ['email', 'password', 'firstName', 'lastName'],
+    required: ["email", "password", "firstName", "lastName"],
+};
+export const updateAdminJsonSchema = {
+    type: "object",
+    properties: {
+        email: { type: "string", format: "email" },
+        firstName: { type: "string", minLength: 1, maxLength: 50 },
+        lastName: { type: "string", minLength: 1, maxLength: 50 },
+        role: { type: "string", enum: ["super-admin", "admin"] },
+        businessIds: { type: "array", items: { type: "string" } },
+        isActive: { type: "boolean" },
+    },
 };
 export const loginJsonSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-        email: { type: 'string', format: 'email' },
-        password: { type: 'string', minLength: 1 },
+        email: { type: "string", format: "email" },
+        password: { type: "string", minLength: 1 },
     },
-    required: ['email', 'password'],
+    required: ["email", "password"],
 };
 export const loginResponseJsonSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-        token: { type: 'string' },
+        token: { type: "string" },
         admin: adminJsonSchema,
     },
-    required: ['token', 'admin'],
+    required: ["token", "admin"],
 };
 //# sourceMappingURL=admin.types.js.map

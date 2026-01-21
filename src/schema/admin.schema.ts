@@ -1,5 +1,9 @@
-import { z } from 'zod';
-import { adminSchema, createAdminSchema, loginSchema } from '../types/admin.types.js';
+import { z } from "zod";
+import {
+  adminSchema,
+  createAdminSchema,
+  loginSchema,
+} from "../types/admin.types.js";
 
 // Infer TypeScript types from Zod schemas
 export type Admin = z.infer<typeof adminSchema>;
@@ -8,12 +12,14 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 // MongoDB document type (with ObjectId)
 export interface AdminDocument {
-    _id?: string;
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+  _id?: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: "super-admin" | "admin";
+  businessIds: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -1,18 +1,22 @@
-import type { FastifyPluginAsync } from 'fastify';
-declare module 'fastify' {
+import type { FastifyPluginAsync } from "fastify";
+declare module "fastify" {
     interface FastifyInstance {
         authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+        requireSuperAdmin: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+        authorizeBusinessAccess: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     }
 }
-declare module '@fastify/jwt' {
+declare module "@fastify/jwt" {
     interface FastifyJWT {
         payload: {
             id: string;
             email: string;
+            role: string;
         };
         user: {
             id: string;
             email: string;
+            role: string;
         };
     }
 }

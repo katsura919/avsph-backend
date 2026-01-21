@@ -1,173 +1,190 @@
-import { blogJsonSchema, createBlogJsonSchema, updateBlogJsonSchema, } from '../../types/blog.types.js';
-import { getAllBlogs, getBlogById, getBlogBySlug, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, } from './blog.controllers.js';
+import { blogJsonSchema, createBlogJsonSchema, updateBlogJsonSchema, } from "../../types/blog.types.js";
+import { getAllBlogs, getBlogById, getBlogBySlug, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, } from "./blog.controllers.js";
 const blogRoutes = async (fastify) => {
     // GET /blogs - Get all blogs (with optional filters)
-    fastify.get('/blogs', {
+    fastify.get("/blogs", {
         schema: {
-            description: 'Get all blogs with optional filters',
-            tags: ['Blogs'],
+            description: "Get all blogs with optional filters",
+            tags: ["Blogs"],
             querystring: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    businessId: { type: 'string', description: 'Filter by business ID' },
-                    status: { type: 'string', enum: ['draft', 'published'], description: 'Filter by status' },
+                    businessId: {
+                        type: "string",
+                        description: "Filter by business ID",
+                    },
+                    status: {
+                        type: "string",
+                        enum: ["draft", "published"],
+                        description: "Filter by status",
+                    },
                 },
             },
             response: {
                 200: {
-                    type: 'array',
+                    type: "array",
                     items: blogJsonSchema,
                 },
             },
         },
     }, getAllBlogs);
     // GET /blogs/:id - Get blog by ID
-    fastify.get('/blogs/:id', {
+    fastify.get("/blogs/:id", {
         schema: {
-            description: 'Get a blog by ID',
-            tags: ['Blogs'],
+            description: "Get a blog by ID",
+            tags: ["Blogs"],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Blog ID (MongoDB ObjectId)' },
+                    id: { type: "string", description: "Blog ID (MongoDB ObjectId)" },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             response: {
                 200: blogJsonSchema,
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, getBlogById);
     // GET /blogs/slug/:slug - Get blog by slug (public)
-    fastify.get('/blogs/slug/:slug', {
+    fastify.get("/blogs/slug/:slug", {
         schema: {
-            description: 'Get a published blog by slug',
-            tags: ['Blogs'],
+            description: "Get a published blog by slug",
+            tags: ["Blogs"],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    slug: { type: 'string', description: 'Blog slug' },
+                    slug: { type: "string", description: "Blog slug" },
                 },
-                required: ['slug'],
+                required: ["slug"],
             },
             response: {
                 200: blogJsonSchema,
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, getBlogBySlug);
     // GET /businesses/:businessId/blogs - Get blogs by business
-    fastify.get('/businesses/:businessId/blogs', {
+    fastify.get("/businesses/:businessId/blogs", {
         schema: {
-            description: 'Get all published blogs for a business',
-            tags: ['Blogs'],
+            description: "Get all published blogs for a business",
+            tags: ["Blogs"],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    businessId: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                    businessId: {
+                        type: "string",
+                        description: "Business ID (MongoDB ObjectId)",
+                    },
                 },
-                required: ['businessId'],
+                required: ["businessId"],
             },
             response: {
                 200: {
-                    type: 'array',
+                    type: "array",
                     items: blogJsonSchema,
                 },
             },
         },
     }, getBlogsByBusiness);
-    // POST /blogs - Create blog (protected)
-    fastify.post('/blogs', {
-        preHandler: [fastify.authenticate],
+    // POST /blogs - Create blog (protected with business access check)
+    fastify.post("/blogs", {
+        preHandler: [fastify.authenticate, fastify.authorizeBusinessAccess],
         schema: {
-            description: 'Create a new blog',
-            tags: ['Blogs'],
+            description: "Create a new blog (requires access to the business)",
+            tags: ["Blogs"],
             security: [{ bearerAuth: [] }],
             body: createBlogJsonSchema,
             response: {
                 201: blogJsonSchema,
                 400: {
-                    type: 'object',
+                    type: "object",
                     properties: {
-                        error: { type: 'string' },
-                        details: { type: 'array' },
+                        error: { type: "string" },
+                        details: { type: "array" },
+                    },
+                },
+                403: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
                     },
                 },
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
                 409: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, createBlog);
-    // PUT /blogs/:id - Update blog (protected)
-    fastify.put('/blogs/:id', {
+    // PUT /blogs/:id - Update blog (protected with business access check)
+    fastify.put("/blogs/:id", {
         preHandler: [fastify.authenticate],
         schema: {
-            description: 'Update a blog',
-            tags: ['Blogs'],
+            description: "Update a blog",
+            tags: ["Blogs"],
             security: [{ bearerAuth: [] }],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Blog ID (MongoDB ObjectId)' },
+                    id: { type: "string", description: "Blog ID (MongoDB ObjectId)" },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             body: updateBlogJsonSchema,
             response: {
                 200: blogJsonSchema,
                 400: {
-                    type: 'object',
+                    type: "object",
                     properties: {
-                        error: { type: 'string' },
-                        details: { type: 'array' },
+                        error: { type: "string" },
+                        details: { type: "array" },
                     },
                 },
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
                 409: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, updateBlog);
     // DELETE /blogs/:id - Soft delete blog (protected)
-    fastify.delete('/blogs/:id', {
+    fastify.delete("/blogs/:id", {
         preHandler: [fastify.authenticate],
         schema: {
-            description: 'Soft delete a blog',
-            tags: ['Blogs'],
+            description: "Soft delete a blog",
+            tags: ["Blogs"],
             security: [{ bearerAuth: [] }],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Blog ID (MongoDB ObjectId)' },
+                    id: { type: "string", description: "Blog ID (MongoDB ObjectId)" },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             response: {
                 200: {
-                    type: 'object',
-                    properties: { message: { type: 'string' } },
+                    type: "object",
+                    properties: { message: { type: "string" } },
                 },
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },

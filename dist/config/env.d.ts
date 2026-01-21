@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export declare const envSchema: z.ZodObject<{
     PORT: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
     HOST: z.ZodDefault<z.ZodString>;
@@ -7,6 +7,7 @@ export declare const envSchema: z.ZodObject<{
     API_PREFIX: z.ZodDefault<z.ZodString>;
     LOG_LEVEL: z.ZodDefault<z.ZodEnum<["fatal", "error", "warn", "info", "debug", "trace"]>>;
     MONGODB_URI: z.ZodDefault<z.ZodString>;
+    JWT_SECRET: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     PORT: number;
     HOST: string;
@@ -15,7 +16,9 @@ export declare const envSchema: z.ZodObject<{
     API_PREFIX: string;
     LOG_LEVEL: "fatal" | "error" | "warn" | "info" | "debug" | "trace";
     MONGODB_URI: string;
+    JWT_SECRET: string;
 }, {
+    JWT_SECRET: string;
     PORT?: string | undefined;
     HOST?: string | undefined;
     NODE_ENV?: "development" | "production" | "test" | undefined;
@@ -25,7 +28,7 @@ export declare const envSchema: z.ZodObject<{
     MONGODB_URI?: string | undefined;
 }>;
 export type Env = z.infer<typeof envSchema>;
-declare module 'fastify' {
+declare module "fastify" {
     interface FastifyInstance {
         config: Env;
     }

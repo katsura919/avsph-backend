@@ -1,142 +1,158 @@
-import { businessJsonSchema, createBusinessJsonSchema, updateBusinessJsonSchema, } from '../../types/business.types.js';
-import { getAllBusinesses, getBusinessById, getBusinessBySlug, createBusiness, updateBusiness, deleteBusiness, } from './business.controllers.js';
+import { businessJsonSchema, createBusinessJsonSchema, updateBusinessJsonSchema, } from "../../types/business.types.js";
+import { getAllBusinesses, getBusinessById, getBusinessBySlug, createBusiness, updateBusiness, deleteBusiness, } from "./business.controllers.js";
 const businessRoutes = async (fastify) => {
     // GET /businesses - Get all businesses (public)
-    fastify.get('/businesses', {
+    fastify.get("/businesses", {
         schema: {
-            description: 'Get all active businesses',
-            tags: ['Businesses'],
+            description: "Get all active businesses",
+            tags: ["Businesses"],
             response: {
                 200: {
-                    type: 'array',
+                    type: "array",
                     items: businessJsonSchema,
                 },
             },
         },
     }, getAllBusinesses);
     // GET /businesses/:id - Get business by ID
-    fastify.get('/businesses/:id', {
+    fastify.get("/businesses/:id", {
         schema: {
-            description: 'Get a business by ID',
-            tags: ['Businesses'],
+            description: "Get a business by ID",
+            tags: ["Businesses"],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                    id: {
+                        type: "string",
+                        description: "Business ID (MongoDB ObjectId)",
+                    },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             response: {
                 200: businessJsonSchema,
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, getBusinessById);
     // GET /businesses/slug/:slug - Get business by slug (public)
-    fastify.get('/businesses/slug/:slug', {
+    fastify.get("/businesses/slug/:slug", {
         schema: {
-            description: 'Get a business by slug',
-            tags: ['Businesses'],
+            description: "Get a business by slug",
+            tags: ["Businesses"],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    slug: { type: 'string', description: 'Business slug' },
+                    slug: { type: "string", description: "Business slug" },
                 },
-                required: ['slug'],
+                required: ["slug"],
             },
             response: {
                 200: businessJsonSchema,
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, getBusinessBySlug);
     // POST /businesses - Create business (protected)
-    fastify.post('/businesses', {
+    fastify.post("/businesses", {
         preHandler: [fastify.authenticate],
         schema: {
-            description: 'Create a new business',
-            tags: ['Businesses'],
+            description: "Create a new business",
+            tags: ["Businesses"],
             security: [{ bearerAuth: [] }],
             body: createBusinessJsonSchema,
             response: {
                 201: businessJsonSchema,
                 400: {
-                    type: 'object',
+                    type: "object",
                     properties: {
-                        error: { type: 'string' },
-                        details: { type: 'array' },
+                        error: { type: "string" },
+                        details: { type: "array" },
                     },
                 },
                 409: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, createBusiness);
-    // PUT /businesses/:id - Update business (protected)
-    fastify.put('/businesses/:id', {
-        preHandler: [fastify.authenticate],
+    // PUT /businesses/:id - Update business (protected with business access check)
+    fastify.put("/businesses/:id", {
+        preHandler: [fastify.authenticate, fastify.authorizeBusinessAccess],
         schema: {
-            description: 'Update a business',
-            tags: ['Businesses'],
+            description: "Update a business (requires access to the business)",
+            tags: ["Businesses"],
             security: [{ bearerAuth: [] }],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                    id: {
+                        type: "string",
+                        description: "Business ID (MongoDB ObjectId)",
+                    },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             body: updateBusinessJsonSchema,
             response: {
                 200: businessJsonSchema,
                 400: {
-                    type: 'object',
+                    type: "object",
                     properties: {
-                        error: { type: 'string' },
-                        details: { type: 'array' },
+                        error: { type: "string" },
+                        details: { type: "array" },
+                    },
+                },
+                403: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
                     },
                 },
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
                 409: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },
     }, updateBusiness);
-    // DELETE /businesses/:id - Soft delete business (protected)
-    fastify.delete('/businesses/:id', {
-        preHandler: [fastify.authenticate],
+    // DELETE /businesses/:id - Soft delete business (protected with business access check)
+    fastify.delete("/businesses/:id", {
+        preHandler: [fastify.authenticate, fastify.authorizeBusinessAccess],
         schema: {
-            description: 'Soft delete a business',
-            tags: ['Businesses'],
+            description: "Soft delete a business (requires access to the business)",
+            tags: ["Businesses"],
             security: [{ bearerAuth: [] }],
             params: {
-                type: 'object',
+                type: "object",
                 properties: {
-                    id: { type: 'string', description: 'Business ID (MongoDB ObjectId)' },
+                    id: {
+                        type: "string",
+                        description: "Business ID (MongoDB ObjectId)",
+                    },
                 },
-                required: ['id'],
+                required: ["id"],
             },
             response: {
                 200: {
-                    type: 'object',
-                    properties: { message: { type: 'string' } },
+                    type: "object",
+                    properties: { message: { type: "string" } },
                 },
                 404: {
-                    type: 'object',
-                    properties: { error: { type: 'string' } },
+                    type: "object",
+                    properties: { error: { type: "string" } },
                 },
             },
         },

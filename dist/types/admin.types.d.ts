@@ -1,10 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
+export declare const adminRoleEnum: z.ZodEnum<["super-admin", "admin"]>;
 export declare const adminSchema: z.ZodObject<{
     _id: z.ZodOptional<z.ZodString>;
     email: z.ZodString;
     password: z.ZodString;
     firstName: z.ZodString;
     lastName: z.ZodString;
+    role: z.ZodDefault<z.ZodEnum<["super-admin", "admin"]>>;
+    businessIds: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
@@ -14,6 +17,8 @@ export declare const adminSchema: z.ZodObject<{
     email: string;
     password: string;
     isActive: boolean;
+    role: "super-admin" | "admin";
+    businessIds: string[];
     _id?: string | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
@@ -26,6 +31,8 @@ export declare const adminSchema: z.ZodObject<{
     isActive?: boolean | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
+    role?: "super-admin" | "admin" | undefined;
+    businessIds?: string[] | undefined;
 }>;
 export declare const createAdminSchema: z.ZodObject<Omit<{
     _id: z.ZodOptional<z.ZodString>;
@@ -33,6 +40,8 @@ export declare const createAdminSchema: z.ZodObject<Omit<{
     password: z.ZodString;
     firstName: z.ZodString;
     lastName: z.ZodString;
+    role: z.ZodDefault<z.ZodEnum<["super-admin", "admin"]>>;
+    businessIds: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
@@ -42,12 +51,38 @@ export declare const createAdminSchema: z.ZodObject<Omit<{
     email: string;
     password: string;
     isActive: boolean;
+    role: "super-admin" | "admin";
+    businessIds: string[];
 }, {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
     isActive?: boolean | undefined;
+    role?: "super-admin" | "admin" | undefined;
+    businessIds?: string[] | undefined;
+}>;
+export declare const updateAdminSchema: z.ZodObject<{
+    firstName: z.ZodOptional<z.ZodString>;
+    lastName: z.ZodOptional<z.ZodString>;
+    email: z.ZodOptional<z.ZodString>;
+    role: z.ZodOptional<z.ZodEnum<["super-admin", "admin"]>>;
+    businessIds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    isActive: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    email?: string | undefined;
+    isActive?: boolean | undefined;
+    role?: "super-admin" | "admin" | undefined;
+    businessIds?: string[] | undefined;
+}, {
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    email?: string | undefined;
+    isActive?: boolean | undefined;
+    role?: "super-admin" | "admin" | undefined;
+    businessIds?: string[] | undefined;
 }>;
 export declare const loginSchema: z.ZodObject<{
     email: z.ZodString;
@@ -82,6 +117,16 @@ export declare const adminJsonSchema: {
             readonly minLength: 1;
             readonly maxLength: 50;
         };
+        readonly role: {
+            readonly type: "string";
+            readonly enum: readonly ["super-admin", "admin"];
+        };
+        readonly businessIds: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+            };
+        };
         readonly isActive: {
             readonly type: "boolean";
         };
@@ -94,7 +139,7 @@ export declare const adminJsonSchema: {
             readonly format: "date-time";
         };
     };
-    readonly required: readonly ["email", "firstName", "lastName"];
+    readonly required: readonly ["email", "firstName", "lastName", "role"];
 };
 export declare const createAdminJsonSchema: {
     readonly type: "object";
@@ -117,8 +162,52 @@ export declare const createAdminJsonSchema: {
             readonly minLength: 1;
             readonly maxLength: 50;
         };
+        readonly role: {
+            readonly type: "string";
+            readonly enum: readonly ["super-admin", "admin"];
+            readonly default: "admin";
+        };
+        readonly businessIds: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+            };
+            readonly default: readonly [];
+        };
     };
     readonly required: readonly ["email", "password", "firstName", "lastName"];
+};
+export declare const updateAdminJsonSchema: {
+    readonly type: "object";
+    readonly properties: {
+        readonly email: {
+            readonly type: "string";
+            readonly format: "email";
+        };
+        readonly firstName: {
+            readonly type: "string";
+            readonly minLength: 1;
+            readonly maxLength: 50;
+        };
+        readonly lastName: {
+            readonly type: "string";
+            readonly minLength: 1;
+            readonly maxLength: 50;
+        };
+        readonly role: {
+            readonly type: "string";
+            readonly enum: readonly ["super-admin", "admin"];
+        };
+        readonly businessIds: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+            };
+        };
+        readonly isActive: {
+            readonly type: "boolean";
+        };
+    };
 };
 export declare const loginJsonSchema: {
     readonly type: "object";
@@ -160,6 +249,16 @@ export declare const loginResponseJsonSchema: {
                     readonly minLength: 1;
                     readonly maxLength: 50;
                 };
+                readonly role: {
+                    readonly type: "string";
+                    readonly enum: readonly ["super-admin", "admin"];
+                };
+                readonly businessIds: {
+                    readonly type: "array";
+                    readonly items: {
+                        readonly type: "string";
+                    };
+                };
                 readonly isActive: {
                     readonly type: "boolean";
                 };
@@ -172,7 +271,7 @@ export declare const loginResponseJsonSchema: {
                     readonly format: "date-time";
                 };
             };
-            readonly required: readonly ["email", "firstName", "lastName"];
+            readonly required: readonly ["email", "firstName", "lastName", "role"];
         };
     };
     readonly required: readonly ["token", "admin"];

@@ -1,4 +1,4 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest, FastifyReply } from "fastify";
 interface IdParams {
     id: string;
 }
@@ -10,7 +10,7 @@ interface BusinessIdParams {
 }
 interface BlogQuery {
     businessId?: string;
-    status?: 'draft' | 'published';
+    status?: "draft" | "published";
 }
 export declare function getAllBlogs(request: FastifyRequest<{
     Querystring: BlogQuery;

@@ -243,3 +243,82 @@ export async function deleteBusiness(
 
   return reply.status(200).send({ message: "Business deleted successfully" });
 }
+
+// Upload business logo
+export async function uploadBusinessLogo(
+  request: FastifyRequest<{ Params: IdParams }>,
+  reply: FastifyReply,
+) {
+  const businesses = request.server.mongo.db?.collection("businesses");
+
+  if (!businesses) {
+    return reply.status(500).send({ error: "Database not available" });
+  }
+
+  const { id } = request.params;
+
+  if (!ObjectId.isValid(id)) {
+    return reply.status(400).send({ error: "Invalid business ID format" });
+  }
+
+  // Check if business exists
+  const business = await businesses.findOne({ _id: new ObjectId(id) });
+  if (!business) {
+    return reply.status(404).send({ error: "Business not found" });
+  }
+
+  try {
+    // Get the uploaded file
+    const data = await request.file();
+
+    if (!data) {
+      return reply.status(400).send({ error: "No file uploaded" });
+    }
+
+    // Validate file type
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowedMimeTypes.includes(data.mimetype)) {
+      return reply.status(400).send({
+        error: "Invalid file type. Allowed types: JPEG, PNG, WebP, GIF",
+      });
+    }
+
+    // Convert file stream to buffer
+    const chunks: Buffer[] = [];
+    for await (const chunk of data.file) {
+      chunks.push(chunk);
+    }
+    const fileBuffer = Buffer.concat(chunks);
+
+    // Upload to Cloudinary
+    const uploadResult = await request.server.uploadToCloudinary(fileBuffer, {
+      folder: `businesses/${id}`,
+      public_id: `logo_${Date.now()}`,
+      resource_type: "image",
+    });
+
+    // Update business with new logo URL
+    const result = await businesses.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          logo: uploadResult.secure_url,
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      { returnDocument: "after" },
+    );
+
+    return reply.status(200).send({
+      message: "Logo uploaded successfully",
+      logo: uploadResult.secure_url,
+      business: result,
+    });
+  } catch (error) {
+    request.server.log.error(error);
+    return reply.status(500).send({
+      error: "Failed to upload logo",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}

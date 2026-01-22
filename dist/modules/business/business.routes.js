@@ -1,5 +1,5 @@
 import { businessJsonSchema, createBusinessJsonSchema, updateBusinessJsonSchema, } from "../../types/business.types.js";
-import { getAllBusinesses, getBusinessById, getBusinessBySlug, createBusiness, updateBusiness, deleteBusiness, } from "./business.controllers.js";
+import { getAllBusinesses, getBusinessById, getBusinessBySlug, createBusiness, updateBusiness, deleteBusiness, uploadBusinessLogo, } from "./business.controllers.js";
 const businessRoutes = async (fastify) => {
     // GET /businesses - Get all businesses (public)
     fastify.get("/businesses", {
@@ -157,6 +157,51 @@ const businessRoutes = async (fastify) => {
             },
         },
     }, deleteBusiness);
+    // POST /businesses/:id/logo - Upload business logo (protected)
+    fastify.post("/businesses/:id/logo", {
+        preHandler: [fastify.authenticate, fastify.authorizeBusinessAccess],
+        schema: {
+            description: "Upload a logo for a business (multipart/form-data)",
+            tags: ["Businesses"],
+            security: [{ bearerAuth: [] }],
+            consumes: ["multipart/form-data"],
+            params: {
+                type: "object",
+                properties: {
+                    id: {
+                        type: "string",
+                        description: "Business ID (MongoDB ObjectId)",
+                    },
+                },
+                required: ["id"],
+            },
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        message: { type: "string" },
+                        logo: { type: "string", format: "uri" },
+                        business: businessJsonSchema,
+                    },
+                },
+                400: {
+                    type: "object",
+                    properties: { error: { type: "string" } },
+                },
+                404: {
+                    type: "object",
+                    properties: { error: { type: "string" } },
+                },
+                500: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
+                    },
+                },
+            },
+        },
+    }, uploadBusinessLogo);
 };
 export default businessRoutes;
 //# sourceMappingURL=business.routes.js.map

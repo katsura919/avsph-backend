@@ -11,6 +11,7 @@ import {
   createBusiness,
   updateBusiness,
   deleteBusiness,
+  uploadBusinessLogo,
 } from "./business.controllers.js";
 
 const businessRoutes: FastifyPluginAsync = async (fastify) => {
@@ -198,6 +199,56 @@ const businessRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     deleteBusiness,
+  );
+
+  // POST /businesses/:id/logo - Upload business logo (protected)
+  fastify.post<{ Params: { id: string } }>(
+    "/businesses/:id/logo",
+    {
+      preHandler: [fastify.authenticate, fastify.authorizeBusinessAccess],
+      schema: {
+        description: "Upload a logo for a business (multipart/form-data)",
+        tags: ["Businesses"],
+        security: [{ bearerAuth: [] }],
+        consumes: ["multipart/form-data"],
+        params: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "Business ID (MongoDB ObjectId)",
+            },
+          },
+          required: ["id"],
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              logo: { type: "string", format: "uri" },
+              business: businessJsonSchema,
+            },
+          },
+          400: {
+            type: "object",
+            properties: { error: { type: "string" } },
+          },
+          404: {
+            type: "object",
+            properties: { error: { type: "string" } },
+          },
+          500: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    uploadBusinessLogo,
   );
 };
 

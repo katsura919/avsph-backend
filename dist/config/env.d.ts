@@ -8,6 +8,9 @@ export declare const envSchema: z.ZodObject<{
     LOG_LEVEL: z.ZodDefault<z.ZodEnum<["fatal", "error", "warn", "info", "debug", "trace"]>>;
     MONGODB_URI: z.ZodDefault<z.ZodString>;
     JWT_SECRET: z.ZodString;
+    CLOUDINARY_CLOUD_NAME: z.ZodString;
+    CLOUDINARY_API_KEY: z.ZodString;
+    CLOUDINARY_API_SECRET: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     PORT: number;
     HOST: string;
@@ -17,8 +20,14 @@ export declare const envSchema: z.ZodObject<{
     LOG_LEVEL: "fatal" | "error" | "warn" | "info" | "debug" | "trace";
     MONGODB_URI: string;
     JWT_SECRET: string;
+    CLOUDINARY_CLOUD_NAME: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_API_SECRET: string;
 }, {
     JWT_SECRET: string;
+    CLOUDINARY_CLOUD_NAME: string;
+    CLOUDINARY_API_KEY: string;
+    CLOUDINARY_API_SECRET: string;
     PORT?: string | undefined;
     HOST?: string | undefined;
     NODE_ENV?: "development" | "production" | "test" | undefined;

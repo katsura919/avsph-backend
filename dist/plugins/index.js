@@ -5,4 +5,6 @@ export { default as sensiblePlugin } from './sensible.js';
 export { default as mongodbPlugin } from './mongodb.js';
 export { default as swaggerPlugin } from './swagger.js';
 export { default as authPlugin } from './auth.js';
+export { default as cloudinaryPlugin } from './cloudinary.js';
+export { default as multipartPlugin } from './multipart.js';
 //# sourceMappingURL=index.js.map

@@ -1,5 +1,5 @@
 import Fastify, { type FastifyError } from 'fastify';
-import { envPlugin, corsPlugin, securityPlugin, sensiblePlugin, mongodbPlugin, swaggerPlugin, authPlugin } from './plugins/index.js';
+import { envPlugin, corsPlugin, securityPlugin, sensiblePlugin, mongodbPlugin, swaggerPlugin, authPlugin, cloudinaryPlugin, multipartPlugin } from './plugins/index.js';
 import routes from './routes/routes.js';
 
 async function buildApp() {
@@ -22,7 +22,9 @@ async function buildApp() {
     // Register plugins in order
     await fastify.register(envPlugin);
     await fastify.register(sensiblePlugin);
+    await fastify.register(multipartPlugin);
     await fastify.register(mongodbPlugin);
+    await fastify.register(cloudinaryPlugin);
     await fastify.register(authPlugin);
     await fastify.register(swaggerPlugin);
     await fastify.register(corsPlugin);

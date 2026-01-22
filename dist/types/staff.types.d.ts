@@ -216,15 +216,12 @@ export declare const updateStaffSchema: z.ZodObject<{
 export declare const staffLoginSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
-    businessId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     email: string;
     password: string;
-    businessId: string;
 }, {
     email: string;
     password: string;
-    businessId: string;
 }>;
 export declare const staffChangePasswordSchema: z.ZodObject<{
     currentPassword: z.ZodString;
@@ -490,11 +487,8 @@ export declare const staffLoginJsonSchema: {
             readonly type: "string";
             readonly minLength: 1;
         };
-        readonly businessId: {
-            readonly type: "string";
-        };
     };
-    readonly required: readonly ["email", "password", "businessId"];
+    readonly required: readonly ["email", "password"];
 };
 export declare const staffLoginResponseJsonSchema: {
     readonly type: "object";

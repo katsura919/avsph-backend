@@ -4,8 +4,7 @@ import { staffLoginSchema, staffChangePasswordSchema, } from "../../types/staff.
 // Staff login
 export async function loginStaff(request, reply) {
     const staff = request.server.mongo.db?.collection("staff");
-    const businesses = request.server.mongo.db?.collection("businesses");
-    if (!staff || !businesses) {
+    if (!staff) {
         return reply.status(500).send({ error: "Database not available" });
     }
     const parseResult = staffLoginSchema.safeParse(request.body);
@@ -15,22 +14,10 @@ export async function loginStaff(request, reply) {
             details: parseResult.error.errors,
         });
     }
-    const { email, password, businessId } = parseResult.data;
-    // Validate business exists
-    if (!ObjectId.isValid(businessId)) {
-        return reply.status(400).send({ error: "Invalid business ID format" });
-    }
-    const business = await businesses.findOne({
-        _id: new ObjectId(businessId),
-        isActive: true,
-    });
-    if (!business) {
-        return reply.status(404).send({ error: "Business not found" });
-    }
-    // Find staff member in the specified business
+    const { email, password } = parseResult.data;
+    // Find staff member by email
     const staffMember = await staff.findOne({
         email,
-        businessId,
         isActive: true,
         status: "active",
     });

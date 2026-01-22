@@ -79,7 +79,6 @@ export const updateStaffSchema = z.object({
 export const staffLoginSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(1, 'Password is required'),
-    businessId: z.string().min(1, 'Business ID is required'),
 });
 // Staff change password schema
 export const staffChangePasswordSchema = z.object({
@@ -163,9 +162,8 @@ export const staffLoginJsonSchema = {
     properties: {
         email: { type: 'string', format: 'email' },
         password: { type: 'string', minLength: 1 },
-        businessId: { type: 'string' },
     },
-    required: ['email', 'password', 'businessId'],
+    required: ['email', 'password'],
 };
 export const staffLoginResponseJsonSchema = {
     type: 'object',

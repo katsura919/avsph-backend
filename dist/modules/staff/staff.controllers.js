@@ -118,7 +118,7 @@ export async function createStaff(request, reply) {
             details: parseResult.error.errors,
         });
     }
-    const { firstName, lastName, email, password, phone, position, department, dateHired, salary, employmentType, businessId, } = parseResult.data;
+    const { firstName, lastName, email, password, phone, position, department, dateHired, salary, salaryType, employmentType, businessId, } = parseResult.data;
     // Validate business exists and admin has access
     if (!ObjectId.isValid(businessId)) {
         return reply.status(400).send({ error: "Invalid business ID format" });
@@ -153,6 +153,7 @@ export async function createStaff(request, reply) {
         department,
         dateHired,
         salary,
+        salaryType: salaryType || "monthly",
         employmentType: employmentType || "full-time",
         businessId,
         status: "active",

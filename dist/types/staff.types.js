@@ -11,6 +11,13 @@ export const employmentTypeEnum = z.enum([
     'part-time',
     'contract'
 ]);
+// Salary type enum
+export const salaryTypeEnum = z.enum([
+    'hourly',
+    'daily',
+    'monthly',
+    'annual'
+]);
 // Document schema for staff documents
 export const staffDocumentSchema = z.object({
     name: z.string().min(1).max(100),
@@ -30,6 +37,7 @@ export const staffSchema = z.object({
     department: z.string().max(100).optional(),
     dateHired: z.string().datetime({ message: 'Invalid date format' }),
     salary: z.number().positive().optional(),
+    salaryType: salaryTypeEnum.default('monthly'),
     employmentType: employmentTypeEnum.default('full-time'),
     businessId: z.string().min(1, 'Business ID is required'),
     status: staffStatusEnum.default('active'),
@@ -61,6 +69,7 @@ export const updateStaffSchema = z.object({
     department: z.string().max(100).optional(),
     dateHired: z.string().datetime().optional(),
     salary: z.number().positive().optional(),
+    salaryType: salaryTypeEnum.optional(),
     employmentType: employmentTypeEnum.optional(),
     status: staffStatusEnum.optional(),
     notes: z.string().max(1000).optional(),
@@ -100,6 +109,7 @@ export const staffJsonSchema = {
         department: { type: 'string', maxLength: 100 },
         dateHired: { type: 'string', format: 'date-time' },
         salary: { type: 'number' },
+        salaryType: { type: 'string', enum: ['hourly', 'daily', 'monthly', 'annual'] },
         employmentType: { type: 'string', enum: ['full-time', 'part-time', 'contract'] },
         businessId: { type: 'string' },
         status: { type: 'string', enum: ['active', 'on_leave', 'terminated'] },
@@ -124,6 +134,7 @@ export const createStaffJsonSchema = {
         department: { type: 'string', maxLength: 100 },
         dateHired: { type: 'string', format: 'date-time' },
         salary: { type: 'number' },
+        salaryType: { type: 'string', enum: ['hourly', 'daily', 'monthly', 'annual'] },
         employmentType: { type: 'string', enum: ['full-time', 'part-time', 'contract'] },
         businessId: { type: 'string' },
     },
@@ -140,6 +151,7 @@ export const updateStaffJsonSchema = {
         department: { type: 'string', maxLength: 100 },
         dateHired: { type: 'string', format: 'date-time' },
         salary: { type: 'number' },
+        salaryType: { type: 'string', enum: ['hourly', 'daily', 'monthly', 'annual'] },
         employmentType: { type: 'string', enum: ['full-time', 'part-time', 'contract'] },
         status: { type: 'string', enum: ['active', 'on_leave', 'terminated'] },
         notes: { type: 'string', maxLength: 1000 },

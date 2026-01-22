@@ -192,6 +192,7 @@ export async function createStaff(
         department,
         dateHired,
         salary,
+        salaryType,
         employmentType,
         businessId,
     } = parseResult.data;
@@ -237,6 +238,7 @@ export async function createStaff(
         department,
         dateHired,
         salary,
+        salaryType: salaryType || "monthly",
         employmentType: employmentType || "full-time",
         businessId,
         status: "active" as const,

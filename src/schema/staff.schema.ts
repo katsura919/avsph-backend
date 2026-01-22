@@ -24,6 +24,7 @@ export interface StaffDocumentType {
     department?: string;
     dateHired: string;
     salary?: number;
+    salaryType: 'hourly' | 'daily' | 'monthly' | 'annual';
     employmentType: 'full-time' | 'part-time' | 'contract';
     businessId: string;
     status: 'active' | 'on_leave' | 'terminated';

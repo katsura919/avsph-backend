@@ -2,6 +2,7 @@ import userRoutes from '../modules/user/user.routes.js';
 import adminRoutes from '../modules/admin/admin.routes.js';
 import businessRoutes from '../modules/business/business.routes.js';
 import blogRoutes from '../modules/blog/blog.routes.js';
+import applicantRoutes from '../modules/applicant/applicant.routes.js';
 // Central routes aggregator - register all module routes here
 const routes = async (fastify) => {
     // Admin auth routes
@@ -12,6 +13,8 @@ const routes = async (fastify) => {
     await fastify.register(businessRoutes);
     // Blog routes
     await fastify.register(blogRoutes);
+    // Applicant routes
+    await fastify.register(applicantRoutes);
 };
 export default routes;
 //# sourceMappingURL=routes.js.map

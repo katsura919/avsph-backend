@@ -4,6 +4,7 @@ import adminRoutes from '../modules/admin/admin.routes.js';
 import businessRoutes from '../modules/business/business.routes.js';
 import blogRoutes from '../modules/blog/blog.routes.js';
 import applicantRoutes from '../modules/applicant/applicant.routes.js';
+import staffRoutes from '../modules/staff/staff.routes.js';
 
 // Central routes aggregator - register all module routes here
 const routes: FastifyPluginAsync = async (fastify) => {
@@ -21,6 +22,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
     // Applicant routes
     await fastify.register(applicantRoutes);
+
+    // Staff routes
+    await fastify.register(staffRoutes);
 };
 
 export default routes;

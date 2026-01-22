@@ -14,9 +14,8 @@ export async function loginStaff(
     reply: FastifyReply,
 ) {
     const staff = request.server.mongo.db?.collection("staff");
-    const businesses = request.server.mongo.db?.collection("businesses");
 
-    if (!staff || !businesses) {
+    if (!staff) {
         return reply.status(500).send({ error: "Database not available" });
     }
 
@@ -29,26 +28,11 @@ export async function loginStaff(
         });
     }
 
-    const { email, password, businessId } = parseResult.data;
+    const { email, password } = parseResult.data;
 
-    // Validate business exists
-    if (!ObjectId.isValid(businessId)) {
-        return reply.status(400).send({ error: "Invalid business ID format" });
-    }
-
-    const business = await businesses.findOne({
-        _id: new ObjectId(businessId),
-        isActive: true,
-    });
-
-    if (!business) {
-        return reply.status(404).send({ error: "Business not found" });
-    }
-
-    // Find staff member in the specified business
+    // Find staff member by email
     const staffMember = await staff.findOne({
         email,
-        businessId,
         isActive: true,
         status: "active",
     });

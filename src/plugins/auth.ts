@@ -9,6 +9,10 @@ declare module "fastify" {
       request: FastifyRequest,
       reply: FastifyReply,
     ) => Promise<void>;
+    authenticateStaff: (
+      request: FastifyRequest,
+      reply: FastifyReply,
+    ) => Promise<void>;
     requireSuperAdmin: (
       request: FastifyRequest,
       reply: FastifyReply,
@@ -22,8 +26,8 @@ declare module "fastify" {
 
 declare module "@fastify/jwt" {
   interface FastifyJWT {
-    payload: { id: string; email: string; role: string };
-    user: { id: string; email: string; role: string };
+    payload: { id: string; email: string; role: string; userType?: 'admin' | 'staff'; businessId?: string };
+    user: { id: string; email: string; role: string; userType?: 'admin' | 'staff'; businessId?: string };
   }
 }
 
@@ -37,11 +41,33 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     },
   });
 
+  // Authenticate any user (admin or staff)
   fastify.decorate(
     "authenticate",
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
         await request.jwtVerify();
+      } catch (err) {
+        reply
+          .status(401)
+          .send({ error: "Unauthorized", message: "Invalid or expired token" });
+      }
+    },
+  );
+
+  // Authenticate staff only
+  fastify.decorate(
+    "authenticateStaff",
+    async function (request: FastifyRequest, reply: FastifyReply) {
+      try {
+        await request.jwtVerify();
+
+        if (request.user.userType !== "staff") {
+          reply.status(403).send({
+            error: "Forbidden",
+            message: "This action requires staff authentication",
+          });
+        }
       } catch (err) {
         reply
           .status(401)
@@ -135,3 +161,4 @@ export default fp(authPlugin, {
   name: "auth",
   dependencies: ["env"],
 });
+

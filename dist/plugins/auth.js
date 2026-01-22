@@ -9,9 +9,27 @@ const authPlugin = async (fastify) => {
             expiresIn: "7d",
         },
     });
+    // Authenticate any user (admin or staff)
     fastify.decorate("authenticate", async function (request, reply) {
         try {
             await request.jwtVerify();
+        }
+        catch (err) {
+            reply
+                .status(401)
+                .send({ error: "Unauthorized", message: "Invalid or expired token" });
+        }
+    });
+    // Authenticate staff only
+    fastify.decorate("authenticateStaff", async function (request, reply) {
+        try {
+            await request.jwtVerify();
+            if (request.user.userType !== "staff") {
+                reply.status(403).send({
+                    error: "Forbidden",
+                    message: "This action requires staff authentication",
+                });
+            }
         }
         catch (err) {
             reply

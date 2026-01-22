@@ -22,6 +22,7 @@ export declare const staffSchema: z.ZodObject<{
     firstName: z.ZodString;
     lastName: z.ZodString;
     email: z.ZodString;
+    password: z.ZodString;
     phone: z.ZodOptional<z.ZodString>;
     position: z.ZodString;
     department: z.ZodOptional<z.ZodString>;
@@ -56,6 +57,7 @@ export declare const staffSchema: z.ZodObject<{
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     position: string;
     dateHired: string;
     isActive: boolean;
@@ -79,6 +81,7 @@ export declare const staffSchema: z.ZodObject<{
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     position: string;
     dateHired: string;
     businessId: string;
@@ -105,6 +108,7 @@ export declare const createStaffSchema: z.ZodObject<Omit<{
     firstName: z.ZodString;
     lastName: z.ZodString;
     email: z.ZodString;
+    password: z.ZodString;
     phone: z.ZodOptional<z.ZodString>;
     position: z.ZodString;
     department: z.ZodOptional<z.ZodString>;
@@ -138,6 +142,7 @@ export declare const createStaffSchema: z.ZodObject<Omit<{
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     position: string;
     dateHired: string;
     businessId: string;
@@ -149,6 +154,7 @@ export declare const createStaffSchema: z.ZodObject<Omit<{
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     position: string;
     dateHired: string;
     businessId: string;
@@ -197,6 +203,31 @@ export declare const updateStaffSchema: z.ZodObject<{
     salary?: number | undefined;
     employmentType?: "full-time" | "part-time" | "contract" | undefined;
 }>;
+export declare const staffLoginSchema: z.ZodObject<{
+    email: z.ZodString;
+    password: z.ZodString;
+    businessId: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    email: string;
+    password: string;
+    businessId: string;
+}, {
+    email: string;
+    password: string;
+    businessId: string;
+}>;
+export declare const staffChangePasswordSchema: z.ZodObject<{
+    currentPassword: z.ZodString;
+    newPassword: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    currentPassword: string;
+    newPassword: string;
+}, {
+    currentPassword: string;
+    newPassword: string;
+}>;
+export type StaffLogin = z.infer<typeof staffLoginSchema>;
+export type StaffChangePassword = z.infer<typeof staffChangePasswordSchema>;
 export declare const staffDocumentJsonSchema: {
     readonly type: "object";
     readonly properties: {
@@ -338,6 +369,10 @@ export declare const createStaffJsonSchema: {
             readonly type: "string";
             readonly format: "email";
         };
+        readonly password: {
+            readonly type: "string";
+            readonly minLength: 8;
+        };
         readonly phone: {
             readonly type: "string";
             readonly maxLength: 20;
@@ -366,7 +401,7 @@ export declare const createStaffJsonSchema: {
             readonly type: "string";
         };
     };
-    readonly required: readonly ["firstName", "lastName", "email", "position", "dateHired", "businessId"];
+    readonly required: readonly ["firstName", "lastName", "email", "password", "position", "dateHired", "businessId"];
 };
 export declare const updateStaffJsonSchema: {
     readonly type: "object";
@@ -421,5 +456,145 @@ export declare const updateStaffJsonSchema: {
             readonly type: "boolean";
         };
     };
+};
+export declare const staffLoginJsonSchema: {
+    readonly type: "object";
+    readonly properties: {
+        readonly email: {
+            readonly type: "string";
+            readonly format: "email";
+        };
+        readonly password: {
+            readonly type: "string";
+            readonly minLength: 1;
+        };
+        readonly businessId: {
+            readonly type: "string";
+        };
+    };
+    readonly required: readonly ["email", "password", "businessId"];
+};
+export declare const staffLoginResponseJsonSchema: {
+    readonly type: "object";
+    readonly properties: {
+        readonly token: {
+            readonly type: "string";
+        };
+        readonly staff: {
+            readonly type: "object";
+            readonly properties: {
+                readonly _id: {
+                    readonly type: "string";
+                };
+                readonly firstName: {
+                    readonly type: "string";
+                    readonly minLength: 1;
+                    readonly maxLength: 50;
+                };
+                readonly lastName: {
+                    readonly type: "string";
+                    readonly minLength: 1;
+                    readonly maxLength: 50;
+                };
+                readonly email: {
+                    readonly type: "string";
+                    readonly format: "email";
+                };
+                readonly phone: {
+                    readonly type: "string";
+                    readonly maxLength: 20;
+                };
+                readonly position: {
+                    readonly type: "string";
+                    readonly minLength: 1;
+                    readonly maxLength: 100;
+                };
+                readonly department: {
+                    readonly type: "string";
+                    readonly maxLength: 100;
+                };
+                readonly dateHired: {
+                    readonly type: "string";
+                    readonly format: "date-time";
+                };
+                readonly salary: {
+                    readonly type: "number";
+                };
+                readonly employmentType: {
+                    readonly type: "string";
+                    readonly enum: readonly ["full-time", "part-time", "contract"];
+                };
+                readonly businessId: {
+                    readonly type: "string";
+                };
+                readonly status: {
+                    readonly type: "string";
+                    readonly enum: readonly ["active", "on_leave", "terminated"];
+                };
+                readonly notes: {
+                    readonly type: "string";
+                    readonly maxLength: 1000;
+                };
+                readonly photoUrl: {
+                    readonly type: "string";
+                    readonly format: "uri";
+                };
+                readonly documents: {
+                    readonly type: "array";
+                    readonly items: {
+                        readonly type: "object";
+                        readonly properties: {
+                            readonly name: {
+                                readonly type: "string";
+                                readonly minLength: 1;
+                                readonly maxLength: 100;
+                            };
+                            readonly url: {
+                                readonly type: "string";
+                                readonly format: "uri";
+                            };
+                            readonly type: {
+                                readonly type: "string";
+                                readonly minLength: 1;
+                                readonly maxLength: 50;
+                            };
+                            readonly uploadedAt: {
+                                readonly type: "string";
+                                readonly format: "date-time";
+                            };
+                        };
+                        readonly required: readonly ["name", "url", "type", "uploadedAt"];
+                    };
+                };
+                readonly isActive: {
+                    readonly type: "boolean";
+                };
+                readonly createdAt: {
+                    readonly type: "string";
+                    readonly format: "date-time";
+                };
+                readonly updatedAt: {
+                    readonly type: "string";
+                    readonly format: "date-time";
+                };
+            };
+            readonly required: readonly ["firstName", "lastName", "email", "position", "dateHired", "businessId"];
+        };
+    };
+    readonly required: readonly ["token", "staff"];
+};
+export declare const staffChangePasswordJsonSchema: {
+    readonly type: "object";
+    readonly properties: {
+        readonly currentPassword: {
+            readonly type: "string";
+            readonly minLength: 1;
+        };
+        readonly newPassword: {
+            readonly type: "string";
+            readonly minLength: 8;
+        };
+    };
+    readonly required: readonly ["currentPassword", "newPassword"];
 };
 //# sourceMappingURL=staff.types.d.ts.map

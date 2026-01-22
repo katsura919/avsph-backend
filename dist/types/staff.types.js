@@ -24,6 +24,7 @@ export const staffSchema = z.object({
     firstName: z.string().min(1, 'First name is required').max(50),
     lastName: z.string().min(1, 'Last name is required').max(50),
     email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
     phone: z.string().max(20).optional(),
     position: z.string().min(1, 'Position is required').max(100),
     department: z.string().max(100).optional(),
@@ -64,6 +65,17 @@ export const updateStaffSchema = z.object({
     status: staffStatusEnum.optional(),
     notes: z.string().max(1000).optional(),
     isActive: z.boolean().optional(),
+});
+// Staff login schema
+export const staffLoginSchema = z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(1, 'Password is required'),
+    businessId: z.string().min(1, 'Business ID is required'),
+});
+// Staff change password schema
+export const staffChangePasswordSchema = z.object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z.string().min(8, 'New password must be at least 8 characters'),
 });
 // JSON Schemas for Fastify route validation
 export const staffDocumentJsonSchema = {
@@ -106,6 +118,7 @@ export const createStaffJsonSchema = {
         firstName: { type: 'string', minLength: 1, maxLength: 50 },
         lastName: { type: 'string', minLength: 1, maxLength: 50 },
         email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 8 },
         phone: { type: 'string', maxLength: 20 },
         position: { type: 'string', minLength: 1, maxLength: 100 },
         department: { type: 'string', maxLength: 100 },
@@ -114,7 +127,7 @@ export const createStaffJsonSchema = {
         employmentType: { type: 'string', enum: ['full-time', 'part-time', 'contract'] },
         businessId: { type: 'string' },
     },
-    required: ['firstName', 'lastName', 'email', 'position', 'dateHired', 'businessId'],
+    required: ['firstName', 'lastName', 'email', 'password', 'position', 'dateHired', 'businessId'],
 };
 export const updateStaffJsonSchema = {
     type: 'object',
@@ -132,5 +145,30 @@ export const updateStaffJsonSchema = {
         notes: { type: 'string', maxLength: 1000 },
         isActive: { type: 'boolean' },
     },
+};
+export const staffLoginJsonSchema = {
+    type: 'object',
+    properties: {
+        email: { type: 'string', format: 'email' },
+        password: { type: 'string', minLength: 1 },
+        businessId: { type: 'string' },
+    },
+    required: ['email', 'password', 'businessId'],
+};
+export const staffLoginResponseJsonSchema = {
+    type: 'object',
+    properties: {
+        token: { type: 'string' },
+        staff: staffJsonSchema,
+    },
+    required: ['token', 'staff'],
+};
+export const staffChangePasswordJsonSchema = {
+    type: 'object',
+    properties: {
+        currentPassword: { type: 'string', minLength: 1 },
+        newPassword: { type: 'string', minLength: 8 },
+    },
+    required: ['currentPassword', 'newPassword'],
 };
 //# sourceMappingURL=staff.types.js.map

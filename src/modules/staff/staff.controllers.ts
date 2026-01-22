@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { ObjectId } from "@fastify/mongodb";
+import bcrypt from "bcrypt";
 import {
     createStaffSchema,
     updateStaffSchema,
@@ -185,6 +186,7 @@ export async function createStaff(
         firstName,
         lastName,
         email,
+        password,
         phone,
         position,
         department,
@@ -221,11 +223,15 @@ export async function createStaff(
         return reply.status(409).send({ error: "Staff member with this email already exists in this business" });
     }
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const now = new Date().toISOString();
     const newStaff = {
         firstName,
         lastName,
         email,
+        password: hashedPassword,
         phone,
         position,
         department,
@@ -244,9 +250,12 @@ export async function createStaff(
 
     const result = await staff.insertOne(newStaff);
 
+    // Remove password from response
+    const { password: _, ...staffWithoutPassword } = newStaff;
+
     return reply.status(201).send({
         _id: result.insertedId,
-        ...newStaff,
+        ...staffWithoutPassword,
     });
 }
 

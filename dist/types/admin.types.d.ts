@@ -17,7 +17,7 @@ export declare const adminSchema: z.ZodObject<{
     email: string;
     password: string;
     isActive: boolean;
-    role: "super-admin" | "admin";
+    role: "admin" | "super-admin";
     businessIds: string[];
     _id?: string | undefined;
     createdAt?: string | undefined;
@@ -31,7 +31,7 @@ export declare const adminSchema: z.ZodObject<{
     isActive?: boolean | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
-    role?: "super-admin" | "admin" | undefined;
+    role?: "admin" | "super-admin" | undefined;
     businessIds?: string[] | undefined;
 }>;
 export declare const createAdminSchema: z.ZodObject<Omit<{
@@ -51,7 +51,7 @@ export declare const createAdminSchema: z.ZodObject<Omit<{
     email: string;
     password: string;
     isActive: boolean;
-    role: "super-admin" | "admin";
+    role: "admin" | "super-admin";
     businessIds: string[];
 }, {
     firstName: string;
@@ -59,7 +59,7 @@ export declare const createAdminSchema: z.ZodObject<Omit<{
     email: string;
     password: string;
     isActive?: boolean | undefined;
-    role?: "super-admin" | "admin" | undefined;
+    role?: "admin" | "super-admin" | undefined;
     businessIds?: string[] | undefined;
 }>;
 export declare const updateAdminSchema: z.ZodObject<{
@@ -74,14 +74,14 @@ export declare const updateAdminSchema: z.ZodObject<{
     lastName?: string | undefined;
     email?: string | undefined;
     isActive?: boolean | undefined;
-    role?: "super-admin" | "admin" | undefined;
+    role?: "admin" | "super-admin" | undefined;
     businessIds?: string[] | undefined;
 }, {
     firstName?: string | undefined;
     lastName?: string | undefined;
     email?: string | undefined;
     isActive?: boolean | undefined;
-    role?: "super-admin" | "admin" | undefined;
+    role?: "admin" | "super-admin" | undefined;
     businessIds?: string[] | undefined;
 }>;
 export declare const loginSchema: z.ZodObject<{

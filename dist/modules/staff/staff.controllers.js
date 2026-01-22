@@ -1,4 +1,5 @@
 import { ObjectId } from "@fastify/mongodb";
+import bcrypt from "bcrypt";
 import { createStaffSchema, updateStaffSchema, } from "../../types/staff.types.js";
 // Get all staff (protected - filtered by business access)
 export async function getAllStaff(request, reply) {
@@ -117,7 +118,7 @@ export async function createStaff(request, reply) {
             details: parseResult.error.errors,
         });
     }
-    const { firstName, lastName, email, phone, position, department, dateHired, salary, employmentType, businessId, } = parseResult.data;
+    const { firstName, lastName, email, password, phone, position, department, dateHired, salary, employmentType, businessId, } = parseResult.data;
     // Validate business exists and admin has access
     if (!ObjectId.isValid(businessId)) {
         return reply.status(400).send({ error: "Invalid business ID format" });
@@ -139,11 +140,14 @@ export async function createStaff(request, reply) {
     if (existingStaff) {
         return reply.status(409).send({ error: "Staff member with this email already exists in this business" });
     }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
     const now = new Date().toISOString();
     const newStaff = {
         firstName,
         lastName,
         email,
+        password: hashedPassword,
         phone,
         position,
         department,
@@ -160,9 +164,11 @@ export async function createStaff(request, reply) {
         updatedAt: now,
     };
     const result = await staff.insertOne(newStaff);
+    // Remove password from response
+    const { password: _, ...staffWithoutPassword } = newStaff;
     return reply.status(201).send({
         _id: result.insertedId,
-        ...newStaff,
+        ...staffWithoutPassword,
     });
 }
 // Update staff member (protected - admin only)

@@ -12,6 +12,7 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
+  uploadBlogFeaturedImage,
 } from "./blog.controllers.js";
 
 const blogRoutes: FastifyPluginAsync = async (fastify) => {
@@ -236,6 +237,63 @@ const blogRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     deleteBlog,
+  );
+
+  // POST /blogs/:id/featured-image - Upload blog featured image (protected)
+  fastify.post<{ Params: { id: string } }>(
+    "/blogs/:id/featured-image",
+    {
+      preHandler: [fastify.authenticate],
+      schema: {
+        description: "Upload a featured image for a blog (multipart/form-data)",
+        tags: ["Blogs"],
+        security: [{ bearerAuth: [] }],
+        consumes: ["multipart/form-data"],
+        params: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "Blog ID (MongoDB ObjectId)",
+            },
+          },
+          required: ["id"],
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              featuredImage: { type: "string", format: "uri" },
+              blog: blogJsonSchema,
+            },
+          },
+          400: {
+            type: "object",
+            properties: { error: { type: "string" } },
+          },
+          403: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: { error: { type: "string" } },
+          },
+          500: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    uploadBlogFeaturedImage,
   );
 };
 

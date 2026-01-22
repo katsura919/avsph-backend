@@ -335,3 +335,98 @@ export async function deleteBlog(
 
   return reply.status(200).send({ message: "Blog deleted successfully" });
 }
+
+// Upload blog featured image
+export async function uploadBlogFeaturedImage(
+  request: FastifyRequest<{ Params: IdParams }>,
+  reply: FastifyReply,
+) {
+  const blogs = request.server.mongo.db?.collection("blogs");
+  const businesses = request.server.mongo.db?.collection("businesses");
+
+  if (!blogs || !businesses) {
+    return reply.status(500).send({ error: "Database not available" });
+  }
+
+  const { id } = request.params;
+
+  if (!ObjectId.isValid(id)) {
+    return reply.status(400).send({ error: "Invalid blog ID format" });
+  }
+
+  // Check if blog exists
+  const blog = await blogs.findOne({ _id: new ObjectId(id) });
+  if (!blog) {
+    return reply.status(404).send({ error: "Blog not found" });
+  }
+
+  // Check if admin has access to the blog's business (unless super-admin)
+  if (request.user.role !== "super-admin") {
+    const business = await businesses.findOne({
+      _id: new ObjectId(blog.businessId),
+      adminIds: request.user.id,
+    });
+
+    if (!business) {
+      return reply.status(403).send({
+        error: "Forbidden",
+        message: "You do not have access to this blog's business",
+      });
+    }
+  }
+
+  try {
+    // Get the uploaded file
+    const data = await request.file();
+
+    if (!data) {
+      return reply.status(400).send({ error: "No file uploaded" });
+    }
+
+    // Validate file type
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowedMimeTypes.includes(data.mimetype)) {
+      return reply.status(400).send({
+        error: "Invalid file type. Allowed types: JPEG, PNG, WebP, GIF",
+      });
+    }
+
+    // Convert file stream to buffer
+    const chunks: Buffer[] = [];
+    for await (const chunk of data.file) {
+      chunks.push(chunk);
+    }
+    const fileBuffer = Buffer.concat(chunks);
+
+    // Upload to Cloudinary
+    const uploadResult = await request.server.uploadToCloudinary(fileBuffer, {
+      folder: `blogs/${blog.businessId}/${id}`,
+      public_id: `featured_${Date.now()}`,
+      resource_type: "image",
+    });
+
+    // Update blog with new featured image URL
+    const result = await blogs.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          featuredImage: uploadResult.secure_url,
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      { returnDocument: "after" },
+    );
+
+    return reply.status(200).send({
+      message: "Featured image uploaded successfully",
+      featuredImage: uploadResult.secure_url,
+      blog: result,
+    });
+  } catch (error) {
+    request.server.log.error(error);
+    return reply.status(500).send({
+      error: "Failed to upload featured image",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}

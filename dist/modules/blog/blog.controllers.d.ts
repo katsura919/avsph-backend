@@ -31,5 +31,8 @@ export declare function updateBlog(request: FastifyRequest<{
 export declare function deleteBlog(request: FastifyRequest<{
     Params: IdParams;
 }>, reply: FastifyReply): Promise<never>;
+export declare function uploadBlogFeaturedImage(request: FastifyRequest<{
+    Params: IdParams;
+}>, reply: FastifyReply): Promise<never>;
 export {};
 //# sourceMappingURL=blog.controllers.d.ts.map

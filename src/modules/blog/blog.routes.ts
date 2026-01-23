@@ -101,7 +101,15 @@ const blogRoutes: FastifyPluginAsync = async (fastify) => {
   );
 
   // GET /businesses/:businessId/blogs - Get blogs by business
-  fastify.get<{ Params: { businessId: string } }>(
+  fastify.get<{
+    Params: { businessId: string };
+    Querystring: {
+      search?: string;
+      page?: string;
+      limit?: string;
+      status?: "draft" | "published" | "all";
+    };
+  }>(
     "/businesses/:businessId/blogs",
     {
       schema: {

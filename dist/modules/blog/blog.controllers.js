@@ -61,14 +61,49 @@ export async function getBlogsByBusiness(request, reply) {
         return reply.status(500).send({ error: "Database not available" });
     }
     const { businessId } = request.params;
+    const { search, page = "1", limit = "10", status = "all" } = request.query;
     if (!ObjectId.isValid(businessId)) {
         return reply.status(400).send({ error: "Invalid business ID format" });
     }
+    // Build query
+    const query = { businessId, isActive: true };
+    // Add status filter (if not "all")
+    if (status && status !== "all") {
+        query.status = status;
+    }
+    // Add search filter
+    if (search) {
+        const searchRegex = new RegExp(search, "i");
+        query.$or = [
+            { title: searchRegex },
+            { excerpt: searchRegex },
+            { slug: searchRegex },
+        ];
+    }
+    // Pagination
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+    const skip = (pageNum - 1) * limitNum;
+    // Get total count for pagination
+    const totalItems = await blogs.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / limitNum);
     const result = await blogs
-        .find({ businessId, isActive: true, status: "published" })
+        .find(query)
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
         .toArray();
-    return result;
+    return {
+        data: result,
+        pagination: {
+            page: pageNum,
+            limit: limitNum,
+            totalItems,
+            totalPages,
+            hasNextPage: pageNum < totalPages,
+            hasPrevPage: pageNum > 1,
+        },
+    };
 }
 // Create blog
 export async function createBlog(request, reply) {
@@ -257,7 +292,12 @@ export async function uploadBlogFeaturedImage(request, reply) {
             return reply.status(400).send({ error: "No file uploaded" });
         }
         // Validate file type
-        const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+        ];
         if (!allowedMimeTypes.includes(data.mimetype)) {
             return reply.status(400).send({
                 error: "Invalid file type. Allowed types: JPEG, PNG, WebP, GIF",

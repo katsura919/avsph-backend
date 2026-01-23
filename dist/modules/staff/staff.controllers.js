@@ -82,6 +82,11 @@ export async function getStaffByBusiness(request, reply) {
         return reply.status(500).send({ error: "Database not available" });
     }
     const { businessId } = request.params;
+    const { search, page: pageStr, limit: limitStr, status, employmentType, } = request.query;
+    // Pagination defaults
+    const page = Math.max(1, parseInt(pageStr || "1", 10));
+    const limit = Math.min(100, Math.max(1, parseInt(limitStr || "10", 10)));
+    const skip = (page - 1) * limit;
     if (!ObjectId.isValid(businessId)) {
         return reply.status(400).send({ error: "Invalid business ID format" });
     }
@@ -98,11 +103,47 @@ export async function getStaffByBusiness(request, reply) {
             });
         }
     }
+    // Build query
+    const query = { businessId, isActive: true };
+    // Add search filter
+    if (search && search.trim()) {
+        const searchRegex = new RegExp(search.trim(), "i");
+        query.$or = [
+            { firstName: searchRegex },
+            { lastName: searchRegex },
+            { email: searchRegex },
+            { position: searchRegex },
+            { department: searchRegex },
+        ];
+    }
+    // Add status filter
+    if (status) {
+        query.status = status;
+    }
+    // Add employment type filter
+    if (employmentType) {
+        query.employmentType = employmentType;
+    }
+    // Get total count for pagination
+    const total = await staff.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+    // Get paginated results
     const result = await staff
-        .find({ businessId, isActive: true })
+        .find(query)
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .toArray();
-    return result;
+    return {
+        data: result,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasMore: page < totalPages,
+        },
+    };
 }
 // Create staff member (protected - admin only)
 export async function createStaff(request, reply) {
@@ -133,12 +174,22 @@ export async function createStaff(request, reply) {
     }
     const business = await businesses.findOne(businessQuery);
     if (!business) {
-        return reply.status(404).send({ error: "Business not found or access denied" });
+        return reply
+            .status(404)
+            .send({ error: "Business not found or access denied" });
     }
     // Check if email already exists in this business
-    const existingStaff = await staff.findOne({ email, businessId, isActive: true });
+    const existingStaff = await staff.findOne({
+        email,
+        businessId,
+        isActive: true,
+    });
     if (existingStaff) {
-        return reply.status(409).send({ error: "Staff member with this email already exists in this business" });
+        return reply
+            .status(409)
+            .send({
+            error: "Staff member with this email already exists in this business",
+        });
     }
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -209,7 +260,8 @@ export async function updateStaff(request, reply) {
         });
     }
     // Check if email is being updated and if it conflicts
-    if (parseResult.data.email && parseResult.data.email !== existingStaff.email) {
+    if (parseResult.data.email &&
+        parseResult.data.email !== existingStaff.email) {
         const emailConflict = await staff.findOne({
             email: parseResult.data.email,
             businessId: existingStaff.businessId,
@@ -217,7 +269,11 @@ export async function updateStaff(request, reply) {
             isActive: true,
         });
         if (emailConflict) {
-            return reply.status(409).send({ error: "Staff member with this email already exists in this business" });
+            return reply
+                .status(409)
+                .send({
+                error: "Staff member with this email already exists in this business",
+            });
         }
     }
     const updateData = {
@@ -263,7 +319,9 @@ export async function deleteStaff(request, reply) {
     if (!result) {
         return reply.status(404).send({ error: "Staff member not found" });
     }
-    return reply.status(200).send({ message: "Staff member deleted successfully" });
+    return reply
+        .status(200)
+        .send({ message: "Staff member deleted successfully" });
 }
 // Upload staff photo (protected)
 export async function uploadStaffPhoto(request, reply) {

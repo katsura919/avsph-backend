@@ -73,7 +73,7 @@ const blogRoutes = async (fastify) => {
     // GET /businesses/:businessId/blogs - Get blogs by business
     fastify.get("/businesses/:businessId/blogs", {
         schema: {
-            description: "Get all published blogs for a business",
+            description: "Get all blogs for a business with search, pagination, and filtering",
             tags: ["Blogs"],
             params: {
                 type: "object",
@@ -85,10 +85,51 @@ const blogRoutes = async (fastify) => {
                 },
                 required: ["businessId"],
             },
+            querystring: {
+                type: "object",
+                properties: {
+                    search: {
+                        type: "string",
+                        description: "Search term for title, excerpt, or slug",
+                    },
+                    page: {
+                        type: "string",
+                        default: "1",
+                        description: "Page number",
+                    },
+                    limit: {
+                        type: "string",
+                        default: "10",
+                        description: "Number of items per page",
+                    },
+                    status: {
+                        type: "string",
+                        enum: ["draft", "published", "all"],
+                        default: "all",
+                        description: "Filter by blog status",
+                    },
+                },
+            },
             response: {
                 200: {
-                    type: "array",
-                    items: blogJsonSchema,
+                    type: "object",
+                    properties: {
+                        data: {
+                            type: "array",
+                            items: blogJsonSchema,
+                        },
+                        pagination: {
+                            type: "object",
+                            properties: {
+                                page: { type: "number" },
+                                limit: { type: "number" },
+                                totalItems: { type: "number" },
+                                totalPages: { type: "number" },
+                                hasNextPage: { type: "boolean" },
+                                hasPrevPage: { type: "boolean" },
+                            },
+                        },
+                    },
                 },
             },
         },

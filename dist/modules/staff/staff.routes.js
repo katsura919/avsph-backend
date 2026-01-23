@@ -69,7 +69,7 @@ const staffRoutes = async (fastify) => {
     fastify.get("/businesses/:businessId/staff", {
         preHandler: [fastify.authenticate],
         schema: {
-            description: "Get all staff members for a business (requires authentication)",
+            description: "Get all staff members for a business with search and pagination (requires authentication)",
             tags: ["Staff"],
             security: [{ bearerAuth: [] }],
             params: {
@@ -82,10 +82,52 @@ const staffRoutes = async (fastify) => {
                 },
                 required: ["businessId"],
             },
+            querystring: {
+                type: "object",
+                properties: {
+                    search: {
+                        type: "string",
+                        description: "Search by name, email, position, or department",
+                    },
+                    page: {
+                        type: "string",
+                        description: "Page number (default: 1)",
+                    },
+                    limit: {
+                        type: "string",
+                        description: "Items per page (default: 10, max: 100)",
+                    },
+                    status: {
+                        type: "string",
+                        enum: ["active", "on_leave", "terminated"],
+                        description: "Filter by status",
+                    },
+                    employmentType: {
+                        type: "string",
+                        enum: ["full-time", "part-time", "contract"],
+                        description: "Filter by employment type",
+                    },
+                },
+            },
             response: {
                 200: {
-                    type: "array",
-                    items: staffJsonSchema,
+                    type: "object",
+                    properties: {
+                        data: {
+                            type: "array",
+                            items: staffJsonSchema,
+                        },
+                        pagination: {
+                            type: "object",
+                            properties: {
+                                page: { type: "number" },
+                                limit: { type: "number" },
+                                total: { type: "number" },
+                                totalPages: { type: "number" },
+                                hasMore: { type: "boolean" },
+                            },
+                        },
+                    },
                 },
                 403: {
                     type: "object",

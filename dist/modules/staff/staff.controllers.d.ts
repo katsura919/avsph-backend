@@ -10,6 +10,13 @@ interface StaffQuery {
     status?: string;
     employmentType?: string;
 }
+interface StaffByBusinessQuery {
+    search?: string;
+    page?: string;
+    limit?: string;
+    status?: string;
+    employmentType?: string;
+}
 export declare function getAllStaff(request: FastifyRequest<{
     Querystring: StaffQuery;
 }>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>[]>;
@@ -18,7 +25,17 @@ export declare function getStaffById(request: FastifyRequest<{
 }>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>>;
 export declare function getStaffByBusiness(request: FastifyRequest<{
     Params: BusinessIdParams;
-}>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>[]>;
+    Querystring: StaffByBusinessQuery;
+}>, reply: FastifyReply): Promise<{
+    data: import("mongodb").WithId<import("bson").Document>[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasMore: boolean;
+    };
+}>;
 export declare function createStaff(request: FastifyRequest, reply: FastifyReply): Promise<never>;
 export declare function updateStaff(request: FastifyRequest<{
     Params: IdParams;

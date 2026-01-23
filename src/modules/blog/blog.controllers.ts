@@ -101,9 +101,19 @@ export async function getBlogBySlug(
   return blog;
 }
 
+interface BlogByBusinessQuery {
+  search?: string;
+  page?: string;
+  limit?: string;
+  status?: "draft" | "published" | "all";
+}
+
 // Get blogs by business ID
 export async function getBlogsByBusiness(
-  request: FastifyRequest<{ Params: BusinessIdParams }>,
+  request: FastifyRequest<{
+    Params: BusinessIdParams;
+    Querystring: BlogByBusinessQuery;
+  }>,
   reply: FastifyReply,
 ) {
   const blogs = request.server.mongo.db?.collection("blogs");
@@ -113,17 +123,57 @@ export async function getBlogsByBusiness(
   }
 
   const { businessId } = request.params;
+  const { search, page = "1", limit = "10", status = "all" } = request.query;
 
   if (!ObjectId.isValid(businessId)) {
     return reply.status(400).send({ error: "Invalid business ID format" });
   }
 
+  // Build query
+  const query: any = { businessId, isActive: true };
+
+  // Add status filter (if not "all")
+  if (status && status !== "all") {
+    query.status = status;
+  }
+
+  // Add search filter
+  if (search) {
+    const searchRegex = new RegExp(search, "i");
+    query.$or = [
+      { title: searchRegex },
+      { excerpt: searchRegex },
+      { slug: searchRegex },
+    ];
+  }
+
+  // Pagination
+  const pageNum = Math.max(1, parseInt(page));
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+  const skip = (pageNum - 1) * limitNum;
+
+  // Get total count for pagination
+  const totalItems = await blogs.countDocuments(query);
+  const totalPages = Math.ceil(totalItems / limitNum);
+
   const result = await blogs
-    .find({ businessId, isActive: true, status: "published" })
+    .find(query)
     .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum)
     .toArray();
 
-  return result;
+  return {
+    data: result,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      totalItems,
+      totalPages,
+      hasNextPage: pageNum < totalPages,
+      hasPrevPage: pageNum > 1,
+    },
+  };
 }
 
 // Create blog
@@ -384,7 +434,12 @@ export async function uploadBlogFeaturedImage(
     }
 
     // Validate file type
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const allowedMimeTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ];
     if (!allowedMimeTypes.includes(data.mimetype)) {
       return reply.status(400).send({
         error: "Invalid file type. Allowed types: JPEG, PNG, WebP, GIF",

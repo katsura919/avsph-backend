@@ -7,6 +7,7 @@ export declare const attendanceSchema: z.ZodObject<{
     clockIn: z.ZodString;
     clockOut: z.ZodOptional<z.ZodString>;
     hoursWorked: z.ZodOptional<z.ZodNumber>;
+    workDate: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<["pending", "approved", "rejected"]>>;
     notes: z.ZodOptional<z.ZodString>;
     adminNotes: z.ZodOptional<z.ZodString>;
@@ -21,6 +22,7 @@ export declare const attendanceSchema: z.ZodObject<{
     businessId: string;
     staffId: string;
     clockIn: string;
+    workDate: string;
     _id?: string | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
@@ -34,6 +36,7 @@ export declare const attendanceSchema: z.ZodObject<{
     businessId: string;
     staffId: string;
     clockIn: string;
+    workDate: string;
     status?: "pending" | "rejected" | "approved" | undefined;
     _id?: string | undefined;
     isActive?: boolean | undefined;
@@ -73,6 +76,7 @@ export declare const approveAttendanceSchema: z.ZodObject<{
 export declare const editAttendanceSchema: z.ZodObject<{
     clockIn: z.ZodOptional<z.ZodString>;
     clockOut: z.ZodOptional<z.ZodString>;
+    workDate: z.ZodOptional<z.ZodString>;
     notes: z.ZodOptional<z.ZodString>;
     adminNotes: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<["pending", "approved", "rejected"]>>;
@@ -81,12 +85,14 @@ export declare const editAttendanceSchema: z.ZodObject<{
     notes?: string | undefined;
     clockIn?: string | undefined;
     clockOut?: string | undefined;
+    workDate?: string | undefined;
     adminNotes?: string | undefined;
 }, {
     status?: "pending" | "rejected" | "approved" | undefined;
     notes?: string | undefined;
     clockIn?: string | undefined;
     clockOut?: string | undefined;
+    workDate?: string | undefined;
     adminNotes?: string | undefined;
 }>;
 export type Attendance = z.infer<typeof attendanceSchema>;
@@ -116,6 +122,10 @@ export declare const attendanceJsonSchema: {
         };
         readonly hoursWorked: {
             readonly type: "number";
+        };
+        readonly workDate: {
+            readonly type: "string";
+            readonly pattern: "^\\d{4}-\\d{2}-\\d{2}$";
         };
         readonly status: {
             readonly type: "string";
@@ -148,7 +158,7 @@ export declare const attendanceJsonSchema: {
             readonly format: "date-time";
         };
     };
-    readonly required: readonly ["staffId", "businessId", "clockIn"];
+    readonly required: readonly ["staffId", "businessId", "clockIn", "workDate"];
 };
 export declare const clockInJsonSchema: {
     readonly type: "object";
@@ -192,6 +202,10 @@ export declare const editAttendanceJsonSchema: {
         readonly clockOut: {
             readonly type: "string";
             readonly format: "date-time";
+        };
+        readonly workDate: {
+            readonly type: "string";
+            readonly pattern: "^\\d{4}-\\d{2}-\\d{2}$";
         };
         readonly notes: {
             readonly type: "string";

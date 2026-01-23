@@ -37,16 +37,20 @@ export async function clockIn(request, reply) {
     }
     const parseResult = clockInSchema.safeParse(request.body);
     const notes = parseResult.success ? parseResult.data.notes : undefined;
-    const now = new Date().toISOString();
+    const now = new Date();
+    const nowISO = now.toISOString();
+    // workDate is the business day this shift belongs to (YYYY-MM-DD format)
+    const workDate = now.toISOString().split('T')[0];
     const newAttendance = {
         staffId,
         businessId,
-        clockIn: now,
+        clockIn: nowISO,
+        workDate,
         status: "pending",
         notes,
         isActive: true,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: nowISO,
+        updatedAt: nowISO,
     };
     const result = await attendance.insertOne(newAttendance);
     return reply.status(201).send({

@@ -15,6 +15,7 @@ export const attendanceSchema = z.object({
     clockIn: z.string().datetime(),
     clockOut: z.string().datetime().optional(),
     hoursWorked: z.number().optional(),
+    workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'), // Business day this shift belongs to
     status: attendanceStatusEnum.default('pending'),
     notes: z.string().max(500).optional(),
     adminNotes: z.string().max(500).optional(),
@@ -45,6 +46,7 @@ export const approveAttendanceSchema = z.object({
 export const editAttendanceSchema = z.object({
     clockIn: z.string().datetime().optional(),
     clockOut: z.string().datetime().optional(),
+    workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
     notes: z.string().max(500).optional(),
     adminNotes: z.string().max(500).optional(),
     status: attendanceStatusEnum.optional(),
@@ -67,6 +69,7 @@ export const attendanceJsonSchema = {
         clockIn: { type: 'string', format: 'date-time' },
         clockOut: { type: 'string', format: 'date-time' },
         hoursWorked: { type: 'number' },
+        workDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
         status: { type: 'string', enum: ['pending', 'approved', 'rejected'] },
         notes: { type: 'string', maxLength: 500 },
         adminNotes: { type: 'string', maxLength: 500 },
@@ -76,7 +79,7 @@ export const attendanceJsonSchema = {
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' },
     },
-    required: ['staffId', 'businessId', 'clockIn'],
+    required: ['staffId', 'businessId', 'clockIn', 'workDate'],
 } as const;
 
 export const clockInJsonSchema = {
@@ -107,6 +110,7 @@ export const editAttendanceJsonSchema = {
     properties: {
         clockIn: { type: 'string', format: 'date-time' },
         clockOut: { type: 'string', format: 'date-time' },
+        workDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
         notes: { type: 'string', maxLength: 500 },
         adminNotes: { type: 'string', maxLength: 500 },
         status: { type: 'string', enum: ['pending', 'approved', 'rejected'] },

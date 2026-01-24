@@ -58,6 +58,57 @@ export async function getBlogBySlug(request, reply) {
     }
     return blog;
 }
+// Get public blogs for landing page (minimal fields)
+export async function getPublicBlogs(request, reply) {
+    const blogs = request.server.mongo.db?.collection("blogs");
+    if (!blogs) {
+        return reply.status(500).send({ error: "Database not available" });
+    }
+    const { businessId, category, page = "1", limit = "10" } = request.query;
+    // Build query - only published and active blogs
+    const query = { isActive: true, status: "published" };
+    // Filter by business if provided
+    if (businessId) {
+        query.businessId = businessId;
+    }
+    // Filter by category if provided
+    if (category) {
+        query.category = category;
+    }
+    // Pagination
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit)));
+    const skip = (pageNum - 1) * limitNum;
+    // Get total count for pagination
+    const totalItems = await blogs.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / limitNum);
+    // Project only required fields
+    const result = await blogs
+        .find(query)
+        .project({
+        _id: 1,
+        title: 1,
+        featuredImage: 1,
+        category: 1,
+        slug: 1,
+        createdAt: 1,
+    })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .toArray();
+    return {
+        data: result,
+        pagination: {
+            page: pageNum,
+            limit: limitNum,
+            totalItems,
+            totalPages,
+            hasNextPage: pageNum < totalPages,
+            hasPrevPage: pageNum > 1,
+        },
+    };
+}
 // Get blogs by business ID
 export async function getBlogsByBusiness(request, reply) {
     const blogs = request.server.mongo.db?.collection("blogs");

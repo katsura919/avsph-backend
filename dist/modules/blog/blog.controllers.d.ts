@@ -22,6 +22,25 @@ export declare function getBlogById(request: FastifyRequest<{
 export declare function getBlogBySlug(request: FastifyRequest<{
     Params: SlugParams;
 }>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>>;
+interface PublicBlogsQuery {
+    businessId?: string;
+    category?: string;
+    page?: string;
+    limit?: string;
+}
+export declare function getPublicBlogs(request: FastifyRequest<{
+    Querystring: PublicBlogsQuery;
+}>, reply: FastifyReply): Promise<{
+    data: import("bson").Document[];
+    pagination: {
+        page: number;
+        limit: number;
+        totalItems: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+    };
+}>;
 interface BlogByBusinessQuery {
     search?: string;
     page?: string;

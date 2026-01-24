@@ -18,6 +18,10 @@ export async function getAllBlogs(request, reply) {
     if (request.query.status) {
         query.status = request.query.status;
     }
+    // Filter by category if provided
+    if (request.query.category) {
+        query.category = request.query.category;
+    }
     const result = await blogs.find(query).sort({ createdAt: -1 }).toArray();
     return result;
 }
@@ -119,7 +123,7 @@ export async function createBlog(request, reply) {
             details: parseResult.error.errors,
         });
     }
-    const { title, slug, content, excerpt, featuredImage, businessId, status = "draft", isActive = true, } = parseResult.data;
+    const { title, slug, content, excerpt, featuredImage, category, businessId, status = "draft", isActive = true, } = parseResult.data;
     // Validate business exists
     if (!ObjectId.isValid(businessId)) {
         return reply.status(400).send({ error: "Invalid business ID format" });
@@ -143,6 +147,7 @@ export async function createBlog(request, reply) {
         content,
         excerpt,
         featuredImage,
+        category,
         businessId,
         authorId: request.user.id,
         status,

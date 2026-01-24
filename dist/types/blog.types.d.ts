@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export declare const blogStatusEnum: z.ZodEnum<["draft", "published"]>;
 export declare const blogSchema: z.ZodObject<{
     _id: z.ZodOptional<z.ZodString>;
@@ -7,6 +7,7 @@ export declare const blogSchema: z.ZodObject<{
     content: z.ZodString;
     excerpt: z.ZodOptional<z.ZodString>;
     featuredImage: z.ZodOptional<z.ZodString>;
+    category: z.ZodOptional<z.ZodString>;
     businessId: z.ZodString;
     authorId: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<["draft", "published"]>>;
@@ -27,6 +28,7 @@ export declare const blogSchema: z.ZodObject<{
     updatedAt?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
     publishedAt?: string | undefined;
 }, {
     content: string;
@@ -41,6 +43,7 @@ export declare const blogSchema: z.ZodObject<{
     updatedAt?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
     publishedAt?: string | undefined;
 }>;
 export declare const createBlogSchema: z.ZodObject<Omit<{
@@ -50,6 +53,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     content: z.ZodString;
     excerpt: z.ZodOptional<z.ZodString>;
     featuredImage: z.ZodOptional<z.ZodString>;
+    category: z.ZodOptional<z.ZodString>;
     businessId: z.ZodString;
     authorId: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<["draft", "published"]>>;
@@ -66,6 +70,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     businessId: string;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
 }, {
     content: string;
     title: string;
@@ -75,6 +80,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     isActive?: boolean | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
 }>;
 export declare const updateBlogSchema: z.ZodObject<Omit<{
     status: z.ZodOptional<z.ZodDefault<z.ZodEnum<["draft", "published"]>>>;
@@ -84,6 +90,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug: z.ZodOptional<z.ZodString>;
     excerpt: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     featuredImage: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    category: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     businessId: z.ZodOptional<z.ZodString>;
 }, "businessId">, "strip", z.ZodTypeAny, {
     status?: "draft" | "published" | undefined;
@@ -93,6 +100,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
 }, {
     status?: "draft" | "published" | undefined;
     content?: string | undefined;
@@ -101,6 +109,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    category?: string | undefined;
 }>;
 export declare const blogJsonSchema: {
     readonly type: "object";
@@ -129,6 +138,10 @@ export declare const blogJsonSchema: {
         readonly featuredImage: {
             readonly type: "string";
             readonly format: "uri";
+        };
+        readonly category: {
+            readonly type: "string";
+            readonly maxLength: 100;
         };
         readonly businessId: {
             readonly type: "string";
@@ -184,6 +197,10 @@ export declare const createBlogJsonSchema: {
             readonly type: "string";
             readonly format: "uri";
         };
+        readonly category: {
+            readonly type: "string";
+            readonly maxLength: 100;
+        };
         readonly businessId: {
             readonly type: "string";
         };
@@ -224,6 +241,10 @@ export declare const updateBlogJsonSchema: {
         readonly featuredImage: {
             readonly type: "string";
             readonly format: "uri";
+        };
+        readonly category: {
+            readonly type: "string";
+            readonly maxLength: 100;
         };
         readonly status: {
             readonly type: "string";

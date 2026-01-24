@@ -11,6 +11,7 @@ interface BusinessIdParams {
 interface BlogQuery {
     businessId?: string;
     status?: "draft" | "published";
+    category?: string;
 }
 export declare function getAllBlogs(request: FastifyRequest<{
     Querystring: BlogQuery;

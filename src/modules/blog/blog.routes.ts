@@ -35,6 +35,10 @@ const blogRoutes: FastifyPluginAsync = async (fastify) => {
               enum: ["draft", "published"],
               description: "Filter by status",
             },
+            category: {
+              type: "string",
+              description: "Filter by category",
+            },
           },
         },
         response: {

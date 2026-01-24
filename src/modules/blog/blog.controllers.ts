@@ -17,6 +17,7 @@ interface BusinessIdParams {
 interface BlogQuery {
   businessId?: string;
   status?: "draft" | "published";
+  category?: string;
 }
 
 // Get all blogs
@@ -43,6 +44,11 @@ export async function getAllBlogs(
   // Filter by status if provided
   if (request.query.status) {
     query.status = request.query.status;
+  }
+
+  // Filter by category if provided
+  if (request.query.category) {
+    query.category = request.query.category;
   }
 
   const result = await blogs.find(query).sort({ createdAt: -1 }).toArray();
@@ -200,6 +206,7 @@ export async function createBlog(request: FastifyRequest, reply: FastifyReply) {
     content,
     excerpt,
     featuredImage,
+    category,
     businessId,
     status = "draft",
     isActive = true,
@@ -231,6 +238,7 @@ export async function createBlog(request: FastifyRequest, reply: FastifyReply) {
     content,
     excerpt,
     featuredImage,
+    category,
     businessId,
     authorId: request.user.id,
     status,

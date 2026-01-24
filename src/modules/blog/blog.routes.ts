@@ -8,6 +8,7 @@ import {
   getAllBlogs,
   getBlogById,
   getBlogBySlug,
+  getPublicBlogs,
   getBlogsByBusiness,
   createBlog,
   updateBlog,
@@ -102,6 +103,81 @@ const blogRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     getBlogBySlug,
+  );
+
+  // GET /blogs/public - Get public blogs for landing page (minimal fields)
+  fastify.get<{
+    Querystring: {
+      businessId?: string;
+      category?: string;
+      page?: string;
+      limit?: string;
+    };
+  }>(
+    "/blogs/public",
+    {
+      schema: {
+        description:
+          "Get public blogs for landing page with minimal fields (title, featuredImage, category, slug, createdAt)",
+        tags: ["Blogs"],
+        querystring: {
+          type: "object",
+          properties: {
+            businessId: {
+              type: "string",
+              description: "Filter by business ID",
+            },
+            category: {
+              type: "string",
+              description: "Filter by category",
+            },
+            page: {
+              type: "string",
+              default: "1",
+              description: "Page number",
+            },
+            limit: {
+              type: "string",
+              default: "10",
+              description: "Number of items per page (max 50)",
+            },
+          },
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              data: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    _id: { type: "string" },
+                    title: { type: "string" },
+                    featuredImage: { type: "string" },
+                    category: { type: "string" },
+                    slug: { type: "string" },
+                    createdAt: { type: "string" },
+                  },
+                },
+              },
+              pagination: {
+                type: "object",
+                properties: {
+                  page: { type: "number" },
+                  limit: { type: "number" },
+                  totalItems: { type: "number" },
+                  totalPages: { type: "number" },
+                  hasNextPage: { type: "boolean" },
+                  hasPrevPage: { type: "boolean" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    getPublicBlogs,
   );
 
   // GET /businesses/:businessId/blogs - Get blogs by business

@@ -1,6 +1,7 @@
 export function getBookingConfirmationEmail(
   fullName: string,
   companyName?: string,
+  businessName?: string,
 ): string {
   return `
 <!DOCTYPE html>
@@ -35,6 +36,18 @@ export function getBookingConfirmationEmail(
                             <p style="margin: 0 0 20px; color: #4a5568; font-size: 16px; line-height: 1.6;">
                                 Thank you for reaching out! We've received your consultation request and are excited to connect with you.
                             </p>
+                            
+                            ${
+                              businessName
+                                ? `
+                            <div style="background-color: #edf2f7; border-left: 4px solid #4299e1; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
+                                <p style="margin: 0; color: #2d3748; font-size: 14px; font-weight: 600;">
+                                    Business: <span style="font-weight: 400;">${businessName}</span>
+                                </p>
+                            </div>
+                            `
+                                : ""
+                            }
                             
                             ${
                               companyName

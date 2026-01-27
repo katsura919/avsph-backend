@@ -9,6 +9,7 @@ import {
   getBookingById,
   updateBooking,
   deleteBooking,
+  getBookingsByBusinessId,
 } from "./booking.controllers.js";
 
 const bookingRoutes: FastifyPluginAsync = async (fastify) => {
@@ -54,6 +55,7 @@ const bookingRoutes: FastifyPluginAsync = async (fastify) => {
               type: "object",
               properties: {
                 _id: { type: "string" },
+                businessId: { type: "string" },
                 fullName: { type: "string" },
                 email: { type: "string" },
                 companyName: { type: "string" },
@@ -92,6 +94,7 @@ const bookingRoutes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               _id: { type: "string" },
+              businessId: { type: "string" },
               fullName: { type: "string" },
               email: { type: "string" },
               companyName: { type: "string" },
@@ -185,6 +188,53 @@ const bookingRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     deleteBooking,
+  );
+
+  // GET /bookings/business/:businessId - Get bookings by business ID
+  fastify.get<{ Params: { businessId: string } }>(
+    "/bookings/business/:businessId",
+    {
+      schema: {
+        description: "Get all booking requests for a specific business",
+        tags: ["Bookings"],
+        params: {
+          type: "object",
+          properties: {
+            businessId: {
+              type: "string",
+              description: "Business ID",
+            },
+          },
+          required: ["businessId"],
+        },
+        response: {
+          200: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                _id: { type: "string" },
+                businessId: { type: "string" },
+                fullName: { type: "string" },
+                email: { type: "string" },
+                companyName: { type: "string" },
+                message: { type: "string" },
+                status: { type: "string" },
+                createdAt: { type: "string" },
+                updatedAt: { type: "string" },
+              },
+            },
+          },
+          400: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    getBookingsByBusinessId,
   );
 };
 

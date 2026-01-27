@@ -1,5 +1,5 @@
 import { bookingJsonSchema, updateBookingJsonSchema, } from "../../types/booking.types.js";
-import { createBooking, getAllBookings, getBookingById, updateBooking, deleteBooking, } from "./booking.controllers.js";
+import { createBooking, getAllBookings, getBookingById, updateBooking, deleteBooking, getBookingsByBusinessId, } from "./booking.controllers.js";
 const bookingRoutes = async (fastify) => {
     // POST /bookings - Create a new booking (public route)
     fastify.post("/bookings", {
@@ -36,6 +36,7 @@ const bookingRoutes = async (fastify) => {
                         type: "object",
                         properties: {
                             _id: { type: "string" },
+                            businessId: { type: "string" },
                             fullName: { type: "string" },
                             email: { type: "string" },
                             companyName: { type: "string" },
@@ -69,6 +70,7 @@ const bookingRoutes = async (fastify) => {
                     type: "object",
                     properties: {
                         _id: { type: "string" },
+                        businessId: { type: "string" },
                         fullName: { type: "string" },
                         email: { type: "string" },
                         companyName: { type: "string" },
@@ -151,6 +153,48 @@ const bookingRoutes = async (fastify) => {
             },
         },
     }, deleteBooking);
+    // GET /bookings/business/:businessId - Get bookings by business ID
+    fastify.get("/bookings/business/:businessId", {
+        schema: {
+            description: "Get all booking requests for a specific business",
+            tags: ["Bookings"],
+            params: {
+                type: "object",
+                properties: {
+                    businessId: {
+                        type: "string",
+                        description: "Business ID",
+                    },
+                },
+                required: ["businessId"],
+            },
+            response: {
+                200: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            _id: { type: "string" },
+                            businessId: { type: "string" },
+                            fullName: { type: "string" },
+                            email: { type: "string" },
+                            companyName: { type: "string" },
+                            message: { type: "string" },
+                            status: { type: "string" },
+                            createdAt: { type: "string" },
+                            updatedAt: { type: "string" },
+                        },
+                    },
+                },
+                400: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                    },
+                },
+            },
+        },
+    }, getBookingsByBusinessId);
 };
 export default bookingRoutes;
 //# sourceMappingURL=booking.routes.js.map

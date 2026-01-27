@@ -13,6 +13,7 @@ export type UpdateBookingInput = z.infer<typeof updateBookingSchema>;
 // MongoDB document type (with ObjectId)
 export interface BookingDocument {
   _id?: string;
+  businessId: string;
   fullName: string;
   email: string;
   companyName?: string;

@@ -5,6 +5,7 @@ export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 export type UpdateBookingInput = z.infer<typeof updateBookingSchema>;
 export interface BookingDocument {
     _id?: string;
+    businessId: string;
     fullName: string;
     email: string;
     companyName?: string;

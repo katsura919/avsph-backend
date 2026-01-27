@@ -21,7 +21,18 @@ export async function createBooking(request, reply) {
         const result = await bookings.insertOne(bookingData);
         // Send confirmation email to client
         try {
-            const emailHtml = getBookingConfirmationEmail(validatedData.fullName, validatedData.companyName);
+            // Fetch business name if businessId is provided
+            let businessName;
+            if (validatedData.businessId) {
+                const businesses = request.server.mongo.db?.collection("businesses");
+                if (businesses && ObjectId.isValid(validatedData.businessId)) {
+                    const business = await businesses.findOne({
+                        _id: new ObjectId(validatedData.businessId),
+                    });
+                    businessName = business?.name;
+                }
+            }
+            const emailHtml = getBookingConfirmationEmail(validatedData.fullName, validatedData.companyName, businessName);
             await request.server.mailer.sendMail({
                 from: request.server.config.SMTP_FROM || request.server.config.SMTP_USER,
                 to: validatedData.email,
@@ -124,5 +135,21 @@ export async function deleteBooking(request, reply) {
         return reply.status(404).send({ error: "Booking not found" });
     }
     return reply.send({ message: "Booking deleted successfully" });
+}
+// Get bookings by business ID
+export async function getBookingsByBusinessId(request, reply) {
+    const bookings = request.server.mongo.db?.collection("bookings");
+    if (!bookings) {
+        return reply.status(500).send({ error: "Database not available" });
+    }
+    const { businessId } = request.params;
+    if (!businessId) {
+        return reply.status(400).send({ error: "Business ID is required" });
+    }
+    const result = await bookings
+        .find({ businessId })
+        .sort({ createdAt: -1 })
+        .toArray();
+    return result;
 }
 //# sourceMappingURL=booking.controllers.js.map

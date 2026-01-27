@@ -39,9 +39,22 @@ export async function createBooking(
 
     // Send confirmation email to client
     try {
+      // Fetch business name if businessId is provided
+      let businessName: string | undefined;
+      if (validatedData.businessId) {
+        const businesses = request.server.mongo.db?.collection("businesses");
+        if (businesses && ObjectId.isValid(validatedData.businessId)) {
+          const business = await businesses.findOne({
+            _id: new ObjectId(validatedData.businessId),
+          });
+          businessName = business?.name;
+        }
+      }
+
       const emailHtml = getBookingConfirmationEmail(
         validatedData.fullName,
         validatedData.companyName,
+        businessName,
       );
 
       await request.server.mailer.sendMail({
@@ -194,4 +207,29 @@ export async function deleteBooking(
   }
 
   return reply.send({ message: "Booking deleted successfully" });
+}
+
+// Get bookings by business ID
+export async function getBookingsByBusinessId(
+  request: FastifyRequest<{ Params: { businessId: string } }>,
+  reply: FastifyReply,
+) {
+  const bookings = request.server.mongo.db?.collection("bookings");
+
+  if (!bookings) {
+    return reply.status(500).send({ error: "Database not available" });
+  }
+
+  const { businessId } = request.params;
+
+  if (!businessId) {
+    return reply.status(400).send({ error: "Business ID is required" });
+  }
+
+  const result = await bookings
+    .find({ businessId })
+    .sort({ createdAt: -1 })
+    .toArray();
+
+  return result;
 }

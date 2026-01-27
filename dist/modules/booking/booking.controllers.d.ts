@@ -16,5 +16,10 @@ export declare function updateBooking(request: FastifyRequest<{
 export declare function deleteBooking(request: FastifyRequest<{
     Params: IdParams;
 }>, reply: FastifyReply): Promise<never>;
+export declare function getBookingsByBusinessId(request: FastifyRequest<{
+    Params: {
+        businessId: string;
+    };
+}>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>[]>;
 export {};
 //# sourceMappingURL=booking.controllers.d.ts.map

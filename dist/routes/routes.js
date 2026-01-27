@@ -1,12 +1,13 @@
-import userRoutes from '../modules/user/user.routes.js';
-import adminRoutes from '../modules/admin/admin.routes.js';
-import businessRoutes from '../modules/business/business.routes.js';
-import blogRoutes from '../modules/blog/blog.routes.js';
-import applicantRoutes from '../modules/applicant/applicant.routes.js';
-import staffRoutes from '../modules/staff/staff.routes.js';
-import staffAuthRoutes from '../modules/staff/staff.auth.routes.js';
-import attendanceRoutes from '../modules/attendance/attendance.routes.js';
-import payrollRoutes from '../modules/payroll/payroll.routes.js';
+import userRoutes from "../modules/user/user.routes.js";
+import adminRoutes from "../modules/admin/admin.routes.js";
+import businessRoutes from "../modules/business/business.routes.js";
+import blogRoutes from "../modules/blog/blog.routes.js";
+import applicantRoutes from "../modules/applicant/applicant.routes.js";
+import staffRoutes from "../modules/staff/staff.routes.js";
+import staffAuthRoutes from "../modules/staff/staff.auth.routes.js";
+import attendanceRoutes from "../modules/attendance/attendance.routes.js";
+import payrollRoutes from "../modules/payroll/payroll.routes.js";
+import bookingRoutes from "../modules/booking/booking.routes.js";
 // Central routes aggregator - register all module routes here
 const routes = async (fastify) => {
     // Admin auth routes
@@ -27,6 +28,8 @@ const routes = async (fastify) => {
     await fastify.register(attendanceRoutes);
     // Payroll routes
     await fastify.register(payrollRoutes);
+    // Booking routes (public route for consultation requests)
+    await fastify.register(bookingRoutes);
 };
 export default routes;
 //# sourceMappingURL=routes.js.map

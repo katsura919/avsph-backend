@@ -19,5 +19,15 @@ export const envSchema = z.object({
     CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME is required"),
     CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY is required"),
     CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET is required"),
+    // Nodemailer Configuration
+    SMTP_HOST: z.string().default("smtp.gmail.com"),
+    SMTP_PORT: z.string().default("587").transform(Number),
+    SMTP_SECURE: z
+        .string()
+        .default("false")
+        .transform((val) => val === "true"),
+    SMTP_USER: z.string().min(1, "SMTP_USER is required"),
+    SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
+    SMTP_FROM: z.string().email().optional(),
 });
 //# sourceMappingURL=env.js.map

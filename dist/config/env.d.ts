@@ -11,6 +11,12 @@ export declare const envSchema: z.ZodObject<{
     CLOUDINARY_CLOUD_NAME: z.ZodString;
     CLOUDINARY_API_KEY: z.ZodString;
     CLOUDINARY_API_SECRET: z.ZodString;
+    SMTP_HOST: z.ZodDefault<z.ZodString>;
+    SMTP_PORT: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
+    SMTP_SECURE: z.ZodEffects<z.ZodDefault<z.ZodString>, boolean, string | undefined>;
+    SMTP_USER: z.ZodString;
+    SMTP_PASS: z.ZodString;
+    SMTP_FROM: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     PORT: number;
     HOST: string;
@@ -23,11 +29,19 @@ export declare const envSchema: z.ZodObject<{
     CLOUDINARY_CLOUD_NAME: string;
     CLOUDINARY_API_KEY: string;
     CLOUDINARY_API_SECRET: string;
+    SMTP_HOST: string;
+    SMTP_PORT: number;
+    SMTP_SECURE: boolean;
+    SMTP_USER: string;
+    SMTP_PASS: string;
+    SMTP_FROM?: string | undefined;
 }, {
     JWT_SECRET: string;
     CLOUDINARY_CLOUD_NAME: string;
     CLOUDINARY_API_KEY: string;
     CLOUDINARY_API_SECRET: string;
+    SMTP_USER: string;
+    SMTP_PASS: string;
     PORT?: string | undefined;
     HOST?: string | undefined;
     NODE_ENV?: "development" | "production" | "test" | undefined;
@@ -35,6 +49,10 @@ export declare const envSchema: z.ZodObject<{
     API_PREFIX?: string | undefined;
     LOG_LEVEL?: "fatal" | "error" | "warn" | "info" | "debug" | "trace" | undefined;
     MONGODB_URI?: string | undefined;
+    SMTP_HOST?: string | undefined;
+    SMTP_PORT?: string | undefined;
+    SMTP_SECURE?: string | undefined;
+    SMTP_FROM?: string | undefined;
 }>;
 export type Env = z.infer<typeof envSchema>;
 declare module "fastify" {

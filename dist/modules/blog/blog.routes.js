@@ -1,5 +1,5 @@
 import { blogJsonSchema, createBlogJsonSchema, updateBlogJsonSchema, } from "../../types/blog.types.js";
-import { getAllBlogs, getBlogById, getBlogBySlug, getPublicBlogs, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, uploadBlogFeaturedImage, } from "./blog.controllers.js";
+import { getAllBlogs, getBlogById, getBlogBySlug, getPublicBlogs, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, uploadBlogFeaturedImage, incrementBlogView, } from "./blog.controllers.js";
 const blogRoutes = async (fastify) => {
     // GET /blogs - Get all blogs (with optional filters)
     fastify.get("/blogs", {
@@ -348,6 +348,33 @@ const blogRoutes = async (fastify) => {
             },
         },
     }, uploadBlogFeaturedImage);
+    // POST /blogs/slug/:slug/view - Increment blog view count (public)
+    fastify.post("/blogs/slug/:slug/view", {
+        schema: {
+            description: "Increment view count for a blog",
+            tags: ["Blogs"],
+            params: {
+                type: "object",
+                properties: {
+                    slug: { type: "string", description: "Blog slug" },
+                },
+                required: ["slug"],
+            },
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        message: { type: "string" },
+                        viewCount: { type: "number" },
+                    },
+                },
+                404: {
+                    type: "object",
+                    properties: { error: { type: "string" } },
+                },
+            },
+        },
+    }, incrementBlogView);
 };
 export default blogRoutes;
 //# sourceMappingURL=blog.routes.js.map

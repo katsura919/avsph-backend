@@ -12,6 +12,8 @@ export declare const blogSchema: z.ZodObject<{
     authorId: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<["draft", "published"]>>;
     publishedAt: z.ZodOptional<z.ZodString>;
+    viewCount: z.ZodDefault<z.ZodNumber>;
+    commentCount: z.ZodDefault<z.ZodNumber>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
@@ -23,6 +25,8 @@ export declare const blogSchema: z.ZodObject<{
     slug: string;
     businessId: string;
     authorId: string;
+    viewCount: number;
+    commentCount: number;
     _id?: string | undefined;
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
@@ -45,6 +49,8 @@ export declare const blogSchema: z.ZodObject<{
     featuredImage?: string | undefined;
     category?: string | undefined;
     publishedAt?: string | undefined;
+    viewCount?: number | undefined;
+    commentCount?: number | undefined;
 }>;
 export declare const createBlogSchema: z.ZodObject<Omit<{
     _id: z.ZodOptional<z.ZodString>;
@@ -58,6 +64,8 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     authorId: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<["draft", "published"]>>;
     publishedAt: z.ZodOptional<z.ZodString>;
+    viewCount: z.ZodDefault<z.ZodNumber>;
+    commentCount: z.ZodDefault<z.ZodNumber>;
     isActive: z.ZodDefault<z.ZodBoolean>;
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
@@ -68,6 +76,8 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     isActive: boolean;
     slug: string;
     businessId: string;
+    viewCount: number;
+    commentCount: number;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
     category?: string | undefined;
@@ -81,6 +91,8 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
     category?: string | undefined;
+    viewCount?: number | undefined;
+    commentCount?: number | undefined;
 }>;
 export declare const updateBlogSchema: z.ZodObject<Omit<{
     status: z.ZodOptional<z.ZodDefault<z.ZodEnum<["draft", "published"]>>>;
@@ -92,6 +104,8 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     featuredImage: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     category: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     businessId: z.ZodOptional<z.ZodString>;
+    viewCount: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
+    commentCount: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
 }, "businessId">, "strip", z.ZodTypeAny, {
     status?: "draft" | "published" | undefined;
     content?: string | undefined;
@@ -101,6 +115,8 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
     category?: string | undefined;
+    viewCount?: number | undefined;
+    commentCount?: number | undefined;
 }, {
     status?: "draft" | "published" | undefined;
     content?: string | undefined;
@@ -110,6 +126,8 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
     category?: string | undefined;
+    viewCount?: number | undefined;
+    commentCount?: number | undefined;
 }>;
 export declare const blogJsonSchema: {
     readonly type: "object";
@@ -156,6 +174,16 @@ export declare const blogJsonSchema: {
         readonly publishedAt: {
             readonly type: "string";
             readonly format: "date-time";
+        };
+        readonly viewCount: {
+            readonly type: "number";
+            readonly minimum: 0;
+            readonly default: 0;
+        };
+        readonly commentCount: {
+            readonly type: "number";
+            readonly minimum: 0;
+            readonly default: 0;
         };
         readonly isActive: {
             readonly type: "boolean";

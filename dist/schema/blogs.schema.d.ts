@@ -15,6 +15,8 @@ export interface BlogDocument {
     authorId: string;
     status: "draft" | "published";
     publishedAt?: string;
+    viewCount: number;
+    commentCount: number;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;

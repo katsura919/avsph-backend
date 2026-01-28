@@ -9,20 +9,12 @@ interface LeadQuery {
     status?: "new" | "contacted" | "qualified" | "converted";
     source?: "blog_comment" | "contact_form" | "other";
     search?: string;
-}
-interface PaginationQuery {
     page?: number;
     limit?: number;
-    status?: "new" | "contacted" | "qualified" | "converted";
-    source?: "blog_comment" | "contact_form" | "other";
-    search?: string;
 }
 export declare function getAllLeads(request: FastifyRequest<{
     Querystring: LeadQuery;
-}>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>[]>;
-export declare function getLeadsPaginated(request: FastifyRequest<{
-    Querystring: PaginationQuery;
-}>, reply: FastifyReply): Promise<{
+}>, reply: FastifyReply): Promise<import("mongodb").WithId<import("bson").Document>[] | {
     data: import("mongodb").WithId<import("bson").Document>[];
     pagination: {
         page: number;

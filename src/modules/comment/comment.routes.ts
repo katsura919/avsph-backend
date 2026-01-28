@@ -17,6 +17,7 @@ import {
 interface CommentQuery {
   blogId?: string;
   isApproved?: boolean;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -107,7 +108,7 @@ const commentRoutes: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: [fastify.authenticate],
       schema: {
-        description: "Get all comments with optional filters",
+        description: "Get all comments with optional filters and search",
         tags: ["Comments"],
         security: [{ bearerAuth: [] }],
         querystring: {
@@ -120,6 +121,10 @@ const commentRoutes: FastifyPluginAsync = async (fastify) => {
             isApproved: {
               type: "boolean",
               description: "Filter by approval status",
+            },
+            search: {
+              type: "string",
+              description: "Search by comment text, lead name, or lead email",
             },
             page: {
               type: "number",

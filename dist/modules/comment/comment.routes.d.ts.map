@@ -1,1 +1,1 @@
-{"version":3,"file":"comment.routes.d.ts","sourceRoot":"","sources":["../../../src/modules/comment/comment.routes.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC;AAuBlD,QAAA,MAAM,aAAa,EAAE,kBA6TpB,CAAC;AAEF,eAAe,aAAa,CAAC"}
+{"version":3,"file":"comment.routes.d.ts","sourceRoot":"","sources":["../../../src/modules/comment/comment.routes.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC;AAwBlD,QAAA,MAAM,aAAa,EAAE,kBAiUpB,CAAC;AAEF,eAAe,aAAa,CAAC"}

@@ -64,49 +64,79 @@ export async function getAllComments(request, reply) {
     if (!comments || !leads) {
         return reply.status(500).send({ error: "Database not available" });
     }
-    const query = {};
-    // Filter by blog ID if provided
+    const page = request.query.page || 1;
+    const limit = request.query.limit || 20;
+    const skip = (page - 1) * limit;
+    // Build aggregation pipeline
+    const pipeline = [];
+    // Match stage for basic filters
+    const matchStage = {};
     if (request.query.blogId) {
         if (!ObjectId.isValid(request.query.blogId)) {
             return reply.status(400).send({ error: "Invalid blog ID format" });
         }
-        query.blogId = request.query.blogId;
+        matchStage.blogId = request.query.blogId;
     }
-    // Filter by approval status if provided
     if (request.query.isApproved !== undefined) {
-        query.isApproved = request.query.isApproved;
+        matchStage.isApproved = request.query.isApproved;
     }
-    const page = request.query.page || 1;
-    const limit = request.query.limit || 20;
-    const skip = (page - 1) * limit;
-    const [commentsList, total] = await Promise.all([
-        comments
-            .find(query)
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .toArray(),
-        comments.countDocuments(query),
-    ]);
-    // Populate lead information
-    const commentsWithLeads = await Promise.all(commentsList.map(async (comment) => {
-        const lead = await leads.findOne({ _id: new ObjectId(comment.leadId) });
-        return {
-            _id: comment._id.toString(),
-            blogId: comment.blogId,
-            comment: comment.comment,
-            isApproved: comment.isApproved,
-            createdAt: comment.createdAt,
-            updatedAt: comment.updatedAt,
-            lead: lead
-                ? {
-                    _id: lead._id.toString(),
-                    name: lead.name,
-                    email: lead.email,
-                    phone: lead.phone,
-                }
-                : null,
-        };
+    if (Object.keys(matchStage).length > 0) {
+        pipeline.push({ $match: matchStage });
+    }
+    // Lookup lead information
+    pipeline.push({
+        $lookup: {
+            from: "leads",
+            localField: "leadId",
+            foreignField: "_id",
+            as: "leadData",
+        },
+    });
+    pipeline.push({
+        $unwind: {
+            path: "$leadData",
+            preserveNullAndEmptyArrays: true,
+        },
+    });
+    // Search stage
+    if (request.query.search) {
+        pipeline.push({
+            $match: {
+                $or: [
+                    { comment: { $regex: request.query.search, $options: "i" } },
+                    { "leadData.name": { $regex: request.query.search, $options: "i" } },
+                    { "leadData.email": { $regex: request.query.search, $options: "i" } },
+                ],
+            },
+        });
+    }
+    // Sort by createdAt descending
+    pipeline.push({ $sort: { createdAt: -1 } });
+    // Get total count
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const countResult = await comments.aggregate(countPipeline).toArray();
+    const total = countResult[0]?.total || 0;
+    // Add pagination
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limit });
+    // Execute aggregation
+    const commentsList = await comments.aggregate(pipeline).toArray();
+    // Format response
+    const commentsWithLeads = commentsList.map((comment) => ({
+        _id: comment._id.toString(),
+        blogId: comment.blogId,
+        comment: comment.comment,
+        isApproved: comment.isApproved,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        lead: comment.leadData
+            ? {
+                _id: comment.leadData._id.toString(),
+                name: comment.leadData.name,
+                email: comment.leadData.email,
+                phone: comment.leadData.phone,
+            }
+            : null,
     }));
     return {
         data: commentsWithLeads,

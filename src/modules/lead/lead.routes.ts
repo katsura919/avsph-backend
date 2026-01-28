@@ -7,7 +7,6 @@ import {
 } from "../../types/lead.types.js";
 import {
   getAllLeads,
-  getLeadsPaginated,
   getLeadById,
   getLeadByEmail,
   createLead,
@@ -20,24 +19,19 @@ interface LeadQuery {
   status?: "new" | "contacted" | "qualified" | "converted";
   source?: "blog_comment" | "contact_form" | "other";
   search?: string;
-}
-
-interface PaginationQuery {
   page?: number;
   limit?: number;
-  status?: "new" | "contacted" | "qualified" | "converted";
-  source?: "blog_comment" | "contact_form" | "other";
-  search?: string;
 }
 
 const leadRoutes: FastifyPluginAsync = async (fastify) => {
-  // GET /leads - Get all leads (with optional filters)
+  // GET /leads - Get all leads with optional filters, search, and pagination
   fastify.get<{ Querystring: LeadQuery }>(
     "/leads",
     {
       preHandler: [fastify.authenticate],
       schema: {
-        description: "Get all leads with optional filters",
+        description:
+          "Get all leads with optional filters, search, and pagination",
         tags: ["Leads"],
         security: [{ bearerAuth: [] }],
         querystring: {
@@ -57,83 +51,51 @@ const leadRoutes: FastifyPluginAsync = async (fastify) => {
               type: "string",
               description: "Search by name or email",
             },
-          },
-        },
-        response: {
-          200: {
-            type: "array",
-            items: leadJsonSchema,
-          },
-        },
-      },
-    },
-    getAllLeads,
-  );
-
-  // GET /leads/paginated - Get leads with pagination
-  fastify.get<{ Querystring: PaginationQuery }>(
-    "/leads/paginated",
-    {
-      preHandler: [fastify.authenticate],
-      schema: {
-        description: "Get leads with pagination",
-        tags: ["Leads"],
-        security: [{ bearerAuth: [] }],
-        querystring: {
-          type: "object",
-          properties: {
             page: {
               type: "number",
               minimum: 1,
-              default: 1,
-              description: "Page number",
+              description: "Page number (optional, triggers pagination)",
             },
             limit: {
               type: "number",
               minimum: 1,
               maximum: 100,
               default: 10,
-              description: "Items per page",
-            },
-            status: {
-              type: "string",
-              enum: ["new", "contacted", "qualified", "converted"],
-              description: "Filter by status",
-            },
-            source: {
-              type: "string",
-              enum: ["blog_comment", "contact_form", "other"],
-              description: "Filter by source",
-            },
-            search: {
-              type: "string",
-              description: "Search by name or email",
+              description: "Items per page (optional)",
             },
           },
         },
         response: {
           200: {
-            type: "object",
-            properties: {
-              data: {
+            oneOf: [
+              {
                 type: "array",
                 items: leadJsonSchema,
               },
-              pagination: {
+              {
                 type: "object",
                 properties: {
-                  page: { type: "number" },
-                  limit: { type: "number" },
-                  total: { type: "number" },
-                  totalPages: { type: "number" },
+                  data: {
+                    type: "array",
+                    items: leadJsonSchema,
+                  },
+                  pagination: {
+                    type: "object",
+                    properties: {
+                      page: { type: "number" },
+                      limit: { type: "number" },
+                      total: { type: "number" },
+                      totalPages: { type: "number" },
+                    },
+                  },
                 },
               },
-            },
+            ],
           },
         },
       },
     },
-    getLeadsPaginated,
+    getAllLeads,
   );
 
   // GET /leads/:id - Get lead by ID

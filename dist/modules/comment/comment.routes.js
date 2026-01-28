@@ -76,7 +76,7 @@ const commentRoutes = async (fastify) => {
     fastify.get("/comments", {
         preHandler: [fastify.authenticate],
         schema: {
-            description: "Get all comments with optional filters",
+            description: "Get all comments with optional filters and search",
             tags: ["Comments"],
             security: [{ bearerAuth: [] }],
             querystring: {
@@ -89,6 +89,10 @@ const commentRoutes = async (fastify) => {
                     isApproved: {
                         type: "boolean",
                         description: "Filter by approval status",
+                    },
+                    search: {
+                        type: "string",
+                        description: "Search by comment text, lead name, or lead email",
                     },
                     page: {
                         type: "number",

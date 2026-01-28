@@ -1,6 +1,6 @@
 import { ObjectId } from "@fastify/mongodb";
 import { createLeadSchema, updateLeadSchema, updateLeadStatusSchema, } from "../../types/lead.types.js";
-// Get all leads
+// Get all leads with optional pagination, filtering, and search
 export async function getAllLeads(request, reply) {
     const leads = request.server.mongo.db?.collection("leads");
     if (!leads) {
@@ -22,47 +22,33 @@ export async function getAllLeads(request, reply) {
             { email: { $regex: request.query.search, $options: "i" } },
         ];
     }
+    // Check if pagination is requested
+    if (request.query.page || request.query.limit) {
+        const page = request.query.page || 1;
+        const limit = request.query.limit || 10;
+        const skip = (page - 1) * limit;
+        const [result, total] = await Promise.all([
+            leads
+                .find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .toArray(),
+            leads.countDocuments(query),
+        ]);
+        return {
+            data: result,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
+    }
+    // Return all results without pagination
     const result = await leads.find(query).sort({ createdAt: -1 }).toArray();
     return result;
-}
-// Get leads with pagination
-export async function getLeadsPaginated(request, reply) {
-    const leads = request.server.mongo.db?.collection("leads");
-    if (!leads) {
-        return reply.status(500).send({ error: "Database not available" });
-    }
-    const page = request.query.page || 1;
-    const limit = request.query.limit || 10;
-    const skip = (page - 1) * limit;
-    const query = { isActive: true };
-    // Filter by status if provided
-    if (request.query.status) {
-        query.status = request.query.status;
-    }
-    // Filter by source if provided
-    if (request.query.source) {
-        query.source = request.query.source;
-    }
-    // Search by name or email
-    if (request.query.search) {
-        query.$or = [
-            { name: { $regex: request.query.search, $options: "i" } },
-            { email: { $regex: request.query.search, $options: "i" } },
-        ];
-    }
-    const [result, total] = await Promise.all([
-        leads.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).toArray(),
-        leads.countDocuments(query),
-    ]);
-    return {
-        data: result,
-        pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-        },
-    };
 }
 // Get lead by ID
 export async function getLeadById(request, reply) {

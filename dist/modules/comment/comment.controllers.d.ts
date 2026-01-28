@@ -8,6 +8,7 @@ interface SlugParams {
 interface CommentQuery {
     blogId?: string;
     isApproved?: boolean;
+    search?: string;
     page?: number;
     limit?: number;
 }
@@ -38,14 +39,14 @@ export declare function getAllComments(request: FastifyRequest<{
     Querystring: CommentQuery;
 }>, reply: FastifyReply): Promise<{
     data: {
-        _id: string;
+        _id: any;
         blogId: any;
         comment: any;
         isApproved: any;
         createdAt: any;
         updatedAt: any;
         lead: {
-            _id: string;
+            _id: any;
             name: any;
             email: any;
             phone: any;
@@ -54,7 +55,7 @@ export declare function getAllComments(request: FastifyRequest<{
     pagination: {
         page: number;
         limit: number;
-        total: number;
+        total: any;
         totalPages: number;
     };
 }>;

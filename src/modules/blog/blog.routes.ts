@@ -14,6 +14,7 @@ import {
   updateBlog,
   deleteBlog,
   uploadBlogFeaturedImage,
+  incrementBlogView,
 } from "./blog.controllers.js";
 
 const blogRoutes: FastifyPluginAsync = async (fastify) => {
@@ -424,6 +425,38 @@ const blogRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     uploadBlogFeaturedImage,
+  );
+
+  // POST /blogs/slug/:slug/view - Increment blog view count (public)
+  fastify.post<{ Params: { slug: string } }>(
+    "/blogs/slug/:slug/view",
+    {
+      schema: {
+        description: "Increment view count for a blog",
+        tags: ["Blogs"],
+        params: {
+          type: "object",
+          properties: {
+            slug: { type: "string", description: "Blog slug" },
+          },
+          required: ["slug"],
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              viewCount: { type: "number" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: { error: { type: "string" } },
+          },
+        },
+      },
+    },
+    incrementBlogView,
   );
 };
 

@@ -564,3 +564,39 @@ export async function uploadBlogFeaturedImage(
     });
   }
 }
+
+// Increment blog view count
+export async function incrementBlogView(
+  request: FastifyRequest<{ Params: SlugParams }>,
+  reply: FastifyReply,
+) {
+  const blogs = request.server.mongo.db?.collection("blogs");
+
+  if (!blogs) {
+    return reply.status(500).send({ error: "Database not available" });
+  }
+
+  const { slug } = request.params;
+
+  // Find and increment view count
+  const result = await blogs.findOneAndUpdate(
+    {
+      slug,
+      isActive: true,
+      status: "published",
+    },
+    {
+      $inc: { viewCount: 1 },
+    },
+    { returnDocument: "after" },
+  );
+
+  if (!result) {
+    return reply.status(404).send({ error: "Blog not found" });
+  }
+
+  return {
+    message: "View count incremented",
+    viewCount: result.viewCount,
+  };
+}

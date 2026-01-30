@@ -48,11 +48,14 @@ export async function getBlogBySlug(request, reply) {
         return reply.status(500).send({ error: "Database not available" });
     }
     const { slug } = request.params;
-    const blog = await blogs.findOne({
+    // Find and increment view count in one operation
+    const blog = await blogs.findOneAndUpdate({
         slug,
         isActive: true,
         status: "published",
-    });
+    }, {
+        $inc: { viewCount: 1 },
+    }, { returnDocument: "after" });
     if (!blog) {
         return reply.status(404).send({ error: "Blog not found" });
     }

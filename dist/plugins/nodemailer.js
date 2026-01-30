@@ -10,16 +10,17 @@ const nodemailerPlugin = async (fastify) => {
             pass: fastify.config.SMTP_PASS,
         },
     });
-    // Verify transporter configuration
-    try {
-        await transporter.verify();
-        fastify.log.info("Nodemailer transporter is ready");
-    }
-    catch (error) {
-        fastify.log.error({ err: error }, "Nodemailer transporter verification failed");
-    }
-    // Decorate fastify instance with nodemailer transporter
+    // Decorate fastify instance with nodemailer transporter first
     fastify.decorate("mailer", transporter);
+    // Verify transporter configuration (non-blocking)
+    // This runs in the background and won't block plugin initialization
+    transporter.verify()
+        .then(() => {
+        fastify.log.info("Nodemailer transporter is ready");
+    })
+        .catch((error) => {
+        fastify.log.error({ err: error }, "Nodemailer transporter verification failed");
+    });
 };
 export default fp(nodemailerPlugin, {
     name: "nodemailer",

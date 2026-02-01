@@ -14,7 +14,8 @@ const nodemailerPlugin = async (fastify) => {
     fastify.decorate("mailer", transporter);
     // Verify transporter configuration (non-blocking)
     // This runs in the background and won't block plugin initialization
-    transporter.verify()
+    transporter
+        .verify()
         .then(() => {
         fastify.log.info("Nodemailer transporter is ready");
     })

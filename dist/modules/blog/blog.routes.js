@@ -1,5 +1,5 @@
 import { blogJsonSchema, createBlogJsonSchema, updateBlogJsonSchema, } from "../../types/blog.types.js";
-import { getAllBlogs, getBlogById, getBlogBySlug, getPublicBlogs, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, uploadBlogFeaturedImage, incrementBlogView, } from "./blog.controllers.js";
+import { getAllBlogs, getBlogById, getBlogBySlug, getPublicBlogs, getBlogsByBusiness, createBlog, updateBlog, deleteBlog, uploadBlogFeaturedImage, uploadBlogContentImage, incrementBlogView, } from "./blog.controllers.js";
 const blogRoutes = async (fastify) => {
     // GET /blogs - Get all blogs (with optional filters)
     fastify.get("/blogs", {
@@ -348,6 +348,57 @@ const blogRoutes = async (fastify) => {
             },
         },
     }, uploadBlogFeaturedImage);
+    // POST /blogs/:id/upload-content-image - Upload a content image (authenticated)
+    fastify.post("/blogs/:id/upload-content-image", {
+        onRequest: [fastify.authenticate],
+        schema: {
+            description: "Upload a content image for a blog post",
+            tags: ["Blogs"],
+            consumes: ["multipart/form-data"],
+            params: {
+                type: "object",
+                properties: {
+                    id: { type: "string", description: "Blog ID (MongoDB ObjectId)" },
+                },
+                required: ["id"],
+            },
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        message: { type: "string" },
+                        url: { type: "string" },
+                        blog: blogJsonSchema,
+                    },
+                },
+                400: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
+                    },
+                },
+                403: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
+                    },
+                },
+                404: {
+                    type: "object",
+                    properties: { error: { type: "string" } },
+                },
+                500: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                        message: { type: "string" },
+                    },
+                },
+            },
+        },
+    }, uploadBlogContentImage);
     // POST /blogs/slug/:slug/view - Increment blog view count (public)
     fastify.post("/blogs/slug/:slug/view", {
         schema: {

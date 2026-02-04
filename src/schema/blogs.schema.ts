@@ -18,6 +18,7 @@ export interface BlogDocument {
   content: string;
   excerpt?: string;
   featuredImage?: string;
+  contentImages?: string[];
   category?: string;
   businessId: string;
   authorId: string;

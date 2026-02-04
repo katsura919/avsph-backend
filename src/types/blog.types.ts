@@ -15,6 +15,10 @@ export const blogSchema = z.object({
   content: z.string().min(1, "Content is required"),
   excerpt: z.string().max(500).optional(),
   featuredImage: z.string().url().optional(),
+  contentImages: z
+    .array(z.string().url())
+    .max(5, "Maximum 5 content images allowed")
+    .optional(),
   category: z.string().max(100).optional(),
   businessId: z.string().min(1, "Business ID is required"),
   authorId: z.string().min(1, "Author ID is required"),
@@ -76,6 +80,11 @@ export const createBlogJsonSchema = {
     content: { type: "string", minLength: 1 },
     excerpt: { type: "string", maxLength: 500 },
     featuredImage: { type: "string", format: "uri" },
+    contentImages: {
+      type: "array",
+      items: { type: "string", format: "uri" },
+      maxItems: 5,
+    },
     category: { type: "string", maxLength: 100 },
     businessId: { type: "string" },
     status: { type: "string", enum: ["draft", "published"], default: "draft" },
@@ -97,6 +106,11 @@ export const updateBlogJsonSchema = {
     content: { type: "string", minLength: 1 },
     excerpt: { type: "string", maxLength: 500 },
     featuredImage: { type: "string", format: "uri" },
+    contentImages: {
+      type: "array",
+      items: { type: "string", format: "uri" },
+      maxItems: 5,
+    },
     category: { type: "string", maxLength: 100 },
     status: { type: "string", enum: ["draft", "published"] },
     isActive: { type: "boolean" },

@@ -7,6 +7,7 @@ export declare const blogSchema: z.ZodObject<{
     content: z.ZodString;
     excerpt: z.ZodOptional<z.ZodString>;
     featuredImage: z.ZodOptional<z.ZodString>;
+    contentImages: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     category: z.ZodOptional<z.ZodString>;
     businessId: z.ZodString;
     authorId: z.ZodString;
@@ -32,6 +33,7 @@ export declare const blogSchema: z.ZodObject<{
     updatedAt?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
     publishedAt?: string | undefined;
 }, {
@@ -47,6 +49,7 @@ export declare const blogSchema: z.ZodObject<{
     updatedAt?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
     publishedAt?: string | undefined;
     viewCount?: number | undefined;
@@ -59,6 +62,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     content: z.ZodString;
     excerpt: z.ZodOptional<z.ZodString>;
     featuredImage: z.ZodOptional<z.ZodString>;
+    contentImages: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     category: z.ZodOptional<z.ZodString>;
     businessId: z.ZodString;
     authorId: z.ZodString;
@@ -80,6 +84,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     commentCount: number;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
 }, {
     content: string;
@@ -90,6 +95,7 @@ export declare const createBlogSchema: z.ZodObject<Omit<{
     isActive?: boolean | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
     viewCount?: number | undefined;
     commentCount?: number | undefined;
@@ -102,6 +108,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug: z.ZodOptional<z.ZodString>;
     excerpt: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     featuredImage: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    contentImages: z.ZodOptional<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
     category: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     businessId: z.ZodOptional<z.ZodString>;
     viewCount: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
@@ -114,6 +121,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
     viewCount?: number | undefined;
     commentCount?: number | undefined;
@@ -125,6 +133,7 @@ export declare const updateBlogSchema: z.ZodObject<Omit<{
     slug?: string | undefined;
     excerpt?: string | undefined;
     featuredImage?: string | undefined;
+    contentImages?: string[] | undefined;
     category?: string | undefined;
     viewCount?: number | undefined;
     commentCount?: number | undefined;
@@ -225,6 +234,14 @@ export declare const createBlogJsonSchema: {
             readonly type: "string";
             readonly format: "uri";
         };
+        readonly contentImages: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+                readonly format: "uri";
+            };
+            readonly maxItems: 5;
+        };
         readonly category: {
             readonly type: "string";
             readonly maxLength: 100;
@@ -269,6 +286,14 @@ export declare const updateBlogJsonSchema: {
         readonly featuredImage: {
             readonly type: "string";
             readonly format: "uri";
+        };
+        readonly contentImages: {
+            readonly type: "array";
+            readonly items: {
+                readonly type: "string";
+                readonly format: "uri";
+            };
+            readonly maxItems: 5;
         };
         readonly category: {
             readonly type: "string";

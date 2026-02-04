@@ -77,5 +77,8 @@ export declare function incrementBlogView(request: FastifyRequest<{
     message: string;
     viewCount: any;
 }>;
+export declare function uploadBlogContentImage(request: FastifyRequest<{
+    Params: IdParams;
+}>, reply: FastifyReply): Promise<never>;
 export {};
 //# sourceMappingURL=blog.controllers.d.ts.map
